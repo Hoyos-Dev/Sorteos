@@ -1,0 +1,77 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="onCloseModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-body">
+      <div class="upload-container"> 
+        <div class="upload-description"> 
+          <p>Selecciona o arrastra un archivo Excel (.xlsx, .xls) con las siguientes columnas:</p> 
+          <ul> 
+            <li><strong>DOCUMENTO:</strong> Número de documento del participante</li> 
+            <li><strong>NOMBRE:</strong> Nombre completo del participante</li> 
+            <li><strong>ESTADO:</strong> P (Presente) o G (Ganador) - Opcional</li> 
+          </ul> 
+        </div> 
+        
+        <div 
+          class="drag-drop-area" 
+          [class.drag-over]="isDragOver" 
+          (dragover)="onDragOver($event)" 
+          (dragleave)="onDragLeave($event)" 
+          (drop)="onDrop($event)" 
+          (click)="triggerFileInput()"> 
+          
+          <div class="upload-icon"> 
+            <i class="fas fa-cloud-upload-alt"></i> 
+          </div> 
+          
+          <div class="upload-text"> 
+            <p class="primary-text">Arrastra tu archivo Excel aquí</p> 
+            <p class="secondary-text">o haz clic para seleccionar</p> 
+          </div> 
+          
+          <button type="button" class="btn-seleccionar"> 
+            <i class="fas fa-file-excel"></i> 
+            Seleccionar archivo 
+          </button> 
+        </div> 
+        
+        <input 
+          #fileInput 
+          type="file" 
+          accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" 
+          (change)="onFileSelected($event)" 
+          style="display: none;"> 
+      </div>
+      
+      <div class="selected-file" *ngIf="selectedFile">
+        <div class="file-info">
+          <i class="fas fa-file-excel"></i>
+          <span>{{ selectedFile.name }}</span>
+          <small>({{ formatFileSize(selectedFile.size) }})</small>
+        </div>
+        <button class="remove-file" (click)="removeFile()">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+      
+      <div class="upload-progress" *ngIf="isUploading">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+        </div>
+        <span class="progress-text">{{ uploadProgress }}%</span>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onCloseModal()" [disabled]="isUploading">
+        Cancelar
+      </button>
+      <button 
+        class="btn btn-primary" 
+        (click)="uploadFile()" 
+        [disabled]="!selectedFile || isUploading">
+        <i class="fas fa-upload"></i>
+        {{ isUploading ? 'Subiendo...' : 'Subir Archivo' }}
+      </button>
+    </div>
+  </div>
+</div>

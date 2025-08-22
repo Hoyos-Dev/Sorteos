@@ -1,0 +1,58 @@
+<div class="left-section">
+  <h1 class="home-title">
+    Sorteos <span class="highlight">Gane SuperGiros</span>
+  </h1>
+  <p class="home-subtitle">
+    Crea sorteos transparentes. Agrega participantes y comienza a jugar hoy
+  </p>
+  <form class="home-form">
+    <label for="nombreSorteo" class="form-label">NOMBRE DEL SORTEO</label>
+    <input type="text" id="nombreSorteo" name="nombreSorteo" class="form-input" placeholder="Ingresa el nombre del sorteo" [(ngModel)]="nombreSorteo">
+
+    <div class="textarea-container">
+      <textarea 
+        id="participantes" 
+        name="participantes"
+        class="form-textarea" 
+        rows="6" 
+        placeholder="Participantes" 
+        [(ngModel)]="participantes"
+        (input)="onParticipantesChange()">
+      </textarea>
+      <button type="button" class="form-clear-inside" title="Eliminar todos los participantes de la base de datos" (click)="clearParticipants()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+    <div class="form-actions-row">
+      <div class="form-upload" (click)="openUploadModal()">
+        <mat-icon>upload_file</mat-icon>
+        <span class="button-carga">CARGAR ARCHIVO</span>
+      </div>
+      <div class="participants-count">
+        <span>Participantes: {{ participantCount }}</span>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button 
+        type="button" 
+        class="form-play form-register" 
+        (click)="registrarParticipantes()"
+        [disabled]="isRegistering">
+        {{ isRegistering ? 'CREANDO SORTEO...' : 'CREAR SORTEO' }}
+      </button>
+    </div>
+    
+    <!-- Mensaje de estado del registro -->
+    <div *ngIf="registrationMessage" class="registration-message">
+      {{ registrationMessage }}
+    </div>
+  </form>
+</div>
+
+<!-- Modal de upload -->
+<app-upload-file 
+  [isVisible]="showUploadModal"
+  (closeModal)="closeUploadModal()"
+  (fileUploaded)="onFileUploaded($event)"
+  (participantsExtracted)="onParticipantsExtracted($event)">
+</app-upload-file>

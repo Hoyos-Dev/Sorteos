@@ -1,0 +1,274 @@
+import { Component, OnInit, HostListener } from '@angular/core';
+import { Location } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { ParticipantesService, SorteoListResponse } from '../../services/participantes.service';
+
+interface Participante {
+  documento: string;
+  nombre: string;
+}
+
+@Component({
+  selector: 'app-play-giveaways',
+  templateUrl: './play-giveaways.component.html',
+  styleUrls: ['./play-giveaways.component.scss']
+})
+export class PlayGiveawaysComponent implements OnInit {
+  participanteActual: Participante | null = null;
+  juegoIniciado: boolean = false;
+  nombreAnimado: string = '';
+  nombreAnimadoHTML: string = '';
+  animacionEnCurso: boolean = false;
+  private abecedario: string[] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  sorteoId: string | null = null;
+  sorteoInfo: SorteoListResponse | null = null;
+  ganadoresActuales: number = 0;
+
+  constructor(
+    private location: Location,
+    private route: ActivatedRoute,
+    private participantesService: ParticipantesService,
+    private http: HttpClient
+  ) { }
+
+  ngOnInit(): void {
+    // Obtener el ID del sorteo desde la ruta
+    this.sorteoId = this.route.snapshot.paramMap.get('id');
+    
+    if (this.sorteoId) {
+      this.cargarSorteoInfo();
+    }
+    
+    console.log('Sorteo ID recibido:', this.sorteoId);
+    if (!this.sorteoId) {
+      console.error('No se encontró el ID del sorteo en los parámetros de ruta');
+    }
+  }
+
+  private cargarSorteoInfo(): void {
+    if (this.sorteoId) {
+      // Obtener todos los sorteos y filtrar por ID
+      this.participantesService.obtenerTodosLosSorteos().subscribe({
+        next: (sorteos) => {
+          this.sorteoInfo = sorteos.find(s => s.id.toString() === this.sorteoId) || null;
+          if (this.sorteoInfo) {
+            console.log('Información del sorteo cargada:', this.sorteoInfo);
+            this.cargarGanadoresActuales();
+          }
+        },
+        error: (error) => {
+          console.error('Error cargando información del sorteo:', error);
+        }
+      });
+    }
+  }
+
+  private cargarGanadoresActuales(): void {
+    if (this.sorteoId) {
+      console.log('Cargando ganadores para sorteo:', this.sorteoId);
+      this.participantesService.obtenerGanadoresPorSorteo(Number(this.sorteoId)).subscribe({
+        next: (ganadores) => {
+          this.ganadoresActuales = ganadores.length;
+          console.log('Ganadores actuales cargados:', this.ganadoresActuales, 'Lista:', ganadores);
+          console.log('Cantidad de premios del sorteo:', this.sorteoInfo?.cantidad_premio);
+        },
+        error: (error) => {
+          console.error('Error cargando ganadores:', error);
+          this.ganadoresActuales = 0;
+        }
+      });
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.key === 'a' || event.key === 'A') {
+      this.location.back();
+    } else if (event.key === 'j' || event.key === 'J') {
+      // Verificar si el sorteo está finalizado antes de permitir iniciar el juego
+      if (this.sorteoInfo && this.sorteoInfo.estado === 'finalizado') {
+        console.log('El sorteo está finalizado, no se puede iniciar el juego');
+        return;
+      }
+      
+      this.iniciarJuego();
+    }
+  }
+
+  iniciarJuego() {
+    console.log('Tecla J presionada - Iniciando juego');
+    console.log('Estado actual - Ganadores:', this.ganadoresActuales, 'Cantidad premio:', this.sorteoInfo?.cantidad_premio);
+    
+    if (this.animacionEnCurso) {
+      console.log('Animación en curso, ignorando tecla J');
+      return;
+    }
+    
+    if (!this.sorteoId) {
+      console.error('No se encontró el ID del sorteo');
+      return;
+    }
+
+    // Recargar información del sorteo antes de verificar su estado
+    this.participantesService.obtenerTodosLosSorteos().subscribe({
+      next: (sorteos) => {
+        const sorteoActualizado = sorteos.find(s => s.id.toString() === this.sorteoId);
+        if (sorteoActualizado) {
+          this.sorteoInfo = sorteoActualizado;
+          console.log('Información del sorteo recargada. Estado:', this.sorteoInfo.estado);
+          
+          // Verificar si el sorteo ya está finalizado
+          if (this.sorteoInfo.estado === 'finalizado') {
+            alert('Este sorteo ya ha sido finalizado.');
+            // Limpiar la pantalla del juego
+            this.participanteActual = null;
+            this.nombreAnimado = '';
+            this.nombreAnimadoHTML = '';
+            this.juegoIniciado = false;
+            return;
+          }
+          
+          // Continuar con el resto de la lógica del juego
+          this.continuarInicioJuego();
+        }
+      },
+      error: (error) => {
+        console.error('Error recargando información del sorteo:', error);
+        // Continuar con la información actual si hay error
+        this.continuarInicioJuego();
+      }
+    });
+  }
+
+  private continuarInicioJuego(): void {
+    // Verificar si el sorteo ya está finalizado
+    if (this.sorteoInfo && this.sorteoInfo.estado === 'finalizado') {
+      alert('Este sorteo ya ha sido finalizado.');
+      // Limpiar la pantalla del juego
+      this.participanteActual = null;
+      this.nombreAnimado = '';
+      this.nombreAnimadoHTML = '';
+      this.juegoIniciado = false;
+      return;
+    }
+    
+    console.log('Iniciando juego para sorteo:', this.sorteoId);
+    console.log('URL del endpoint:', `http://localhost:8000/obtener-participante-aleatorio/${this.sorteoId}`);
+
+    this.http.get<any>(`http://localhost:8000/obtener-participante-aleatorio/${this.sorteoId}`).subscribe({
+      next: (response) => {
+        console.log('Respuesta del servidor:', response);
+        if (response.ok && response.participante) {
+          console.log('Participante obtenido:', response.participante);
+          this.participanteActual = response.participante;
+          this.juegoIniciado = true;
+          if (this.participanteActual) {
+            console.log('Iniciando animación para:', this.participanteActual.nombre);
+            this.animarNombre(this.participanteActual.nombre.toUpperCase());
+          }
+          // Marcar como ganador automáticamente
+          this.marcarGanador();
+        } else {
+          // Si no hay participantes disponibles, limpiar la pantalla
+          this.participanteActual = null;
+          this.nombreAnimado = '';
+          this.nombreAnimadoHTML = '';
+          this.juegoIniciado = false;
+          console.log('No hay más participantes disponibles para el sorteo');
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener participante:', error);
+        console.error('Detalles del error:', error.message);
+        console.error('Status del error:', error.status);
+      }
+    });
+  }
+
+  animarNombre(nombreCompleto: string): void {
+    this.animacionEnCurso = true;
+    // Inicializar con letras aleatorias diferentes para cada posición
+    this.nombreAnimado = '';
+    const posicionesIniciales: number[] = [];
+    for (let i = 0; i < nombreCompleto.length; i++) {
+      if (nombreCompleto[i] === ' ') {
+        this.nombreAnimado += ' ';
+        posicionesIniciales.push(-1); // -1 para espacios
+      } else {
+        const posicionAleatoria = Math.floor(Math.random() * this.abecedario.length);
+        this.nombreAnimado += this.abecedario[posicionAleatoria];
+        posicionesIniciales.push(posicionAleatoria);
+      }
+    }
+    
+    let cicloActual = 0;
+    const ciclosPorLetra = 5; // Ciclos antes de que cada letra se detenga (más rápido)
+    let letrasFijas: boolean[] = new Array(nombreCompleto.length).fill(false);
+    
+    const animarTodasLasLetras = () => {
+      if (cicloActual < nombreCompleto.length * ciclosPorLetra) {
+        let nombreTemporal = '';
+        
+        for (let i = 0; i < nombreCompleto.length; i++) {
+          if (nombreCompleto[i] === ' ') {
+            nombreTemporal += ' ';
+          } else {
+            // Calcular si esta letra ya debe estar fija
+            const cicloParaDetener = i * ciclosPorLetra;
+            if (cicloActual >= cicloParaDetener) {
+              nombreTemporal += nombreCompleto[i];
+              letrasFijas[i] = true;
+            } else {
+              // Generar letra aleatoria
+              const nuevaPosicion = Math.floor(Math.random() * this.abecedario.length);
+              nombreTemporal += this.abecedario[nuevaPosicion];
+            }
+          }
+        }
+        
+        this.nombreAnimado = nombreTemporal;
+        this.actualizarHTML();
+        cicloActual++;
+        
+        setTimeout(animarTodasLasLetras, 100); // Velocidad de animación
+      } else {
+        // Animación completada
+        this.nombreAnimado = nombreCompleto;
+        this.actualizarHTML();
+        this.animacionEnCurso = false;
+      }
+    };
+    
+    animarTodasLasLetras();
+  }
+
+  actualizarHTML(): void {
+    let html = '';
+    for (let i = 0; i < this.nombreAnimado.length; i++) {
+      if (this.nombreAnimado[i] === ' ') {
+        html += '<span class="letra">&nbsp;</span>';
+      } else {
+        html += `<span class="letra">${this.nombreAnimado[i]}</span>`;
+      }
+    }
+    this.nombreAnimadoHTML = html;
+  }
+
+  private marcarGanador(): void {
+    if (this.participanteActual && this.sorteoId) {
+      console.log('Marcando ganador:', this.participanteActual.documento);
+      this.participantesService.marcarGanador(Number(this.sorteoId), this.participanteActual.documento).subscribe({
+        next: (response) => {
+          console.log('Participante marcado como ganador:', response);
+          
+          // Recargar el conteo real de ganadores desde el servidor
+          this.cargarGanadoresActuales();
+        },
+        error: (error) => {
+          console.error('Error marcando participante como ganador:', error);
+        }
+      });
+    }
+  }
+}

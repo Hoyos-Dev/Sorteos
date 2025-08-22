@@ -1,0 +1,28 @@
+<div class="list-giveaways-container">
+  <div class="giveaway-card" *ngFor="let sorteo of sorteos">
+    <div class="card-content" (click)="onCardClick(sorteo)">
+      <h3 class="card-title">{{ sorteo.nombre }}</h3>
+      <p class="card-description">{{ sorteo.descripcion }}</p>
+      <div class="card-stats">
+        <span class="participants">Participantes: {{ sorteo.cantidad_participantes }}</span>
+      </div>
+    </div>
+    <div class="card-actions">
+      <button class="delete-button" (click)="onDeleteClick(sorteo.id)" title="Eliminar sorteo">
+        <mat-icon>delete</mat-icon>
+      </button>
+      <button class="play-button" (click)="onPlayClick(sorteo.id)">JUGAR</button>
+    </div>
+  </div>
+  
+  <div class="no-giveaways" *ngIf="sorteos.length === 0">
+    <p>No hay sorteos disponibles</p>
+  </div>
+</div>
+
+<!-- Modal de información del sorteo -->
+<app-info-giveaway 
+  [mostrar]="isModalVisible" 
+  [sorteo]="selectedSorteo" 
+  (closeModal)="onCloseModal()">
+</app-info-giveaway>
