@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from typing import List, Optional
 from models.sorteo import SorteoResponse, DetalleSorteoResponse, EstadoParticipacion, SorteoListResponse
 from models.participante import RegistroSorteoConParticipantesRequest, RegistroSorteoConParticipantesResponse
@@ -21,6 +21,119 @@ def obtener_todos_los_sorteos():
     try:
         sorteos = SorteoService.obtener_todos_los_sorteos()
         return sorteos
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+# Request model for updating sorteo
+class UpdateSorteoRequest(BaseModel):
+    cantidad_premio: Optional[int] = None
+    imagen_fondo: Optional[str] = None
+    nombre: Optional[str] = None
+    descripcion: Optional[str] = None
+
+@router.put("/sorteos/{sorteo_id}", response_model=SorteoResponse)
+def actualizar_sorteo(sorteo_id: int, request: UpdateSorteoRequest):
+    """Actualiza la configuración de un sorteo"""
+    try:
+        # Verificar que el sorteo existe
+        sorteo = SorteoService.obtener_sorteo(sorteo_id)
+        if not sorteo:
+            raise HTTPException(status_code=404, detail="Sorteo no encontrado")
+        
+        # Actualizar el sorteo
+        sorteo_actualizado = SorteoService.actualizar_sorteo(
+            sorteo_id, 
+            request.cantidad_premio, 
+            request.imagen_fondo,
+            request.nombre,
+            request.descripcion
+        )
+        
+        if sorteo_actualizado:
+            return sorteo_actualizado
+        else:
+            print(f"Error: sorteo_actualizado es None para sorteo_id: {sorteo_id}")
+            print(f"Request data: cantidad_premio={request.cantidad_premio}, imagen_fondo={request.imagen_fondo}, nombre={request.nombre}, descripcion={request.descripcion}")
+            raise HTTPException(status_code=400, detail="No se pudo actualizar el sorteo")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error en actualizar_sorteo controller: {e}")
+        print(f"Tipo de error: {type(e)}")
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+@router.post("/sorteos/{sorteo_id}/imagen")
+def subir_imagen_sorteo(sorteo_id: int, file: UploadFile = File(...)):
+    """Sube una imagen para un sorteo"""
+    try:
+        print(f"=== SUBIENDO IMAGEN PARA SORTEO {sorteo_id} ===")
+        print(f"Archivo recibido: {file.filename}")
+        print(f"Content type: {file.content_type}")
+        print(f"Tamaño: {file.size if hasattr(file, 'size') else 'desconocido'}")
+        
+        # Verificar que el sorteo existe
+        sorteo = SorteoService.obtener_sorteo(sorteo_id)
+        if not sorteo:
+            raise HTTPException(status_code=404, detail="Sorteo no encontrado")
+        
+        # Validar tipo de archivo
+        if not file.content_type.startswith('image/'):
+            print(f"Error: Tipo de archivo inválido: {file.content_type}")
+            raise HTTPException(status_code=400, detail="El archivo debe ser una imagen")
+        
+        # Guardar la imagen
+        imagen_guardada = SorteoService.guardar_imagen_sorteo(sorteo_id, file)
+        
+        if imagen_guardada:
+            print(f"Imagen guardada exitosamente en: {imagen_guardada}")
+            return {"mensaje": "Imagen subida exitosamente", "ruta": imagen_guardada}
+        else:
+            print("Error: No se pudo guardar la imagen")
+            raise HTTPException(status_code=400, detail="No se pudo guardar la imagen")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error en subir_imagen_sorteo controller: {e}")
+        print(f"Tipo de error: {type(e)}")
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+@router.get("/sorteos/{sorteo_id}/imagen")
+def obtener_imagen_sorteo(sorteo_id: int):
+    """Obtiene la imagen de un sorteo"""
+    try:
+        # Verificar que el sorteo existe
+        sorteo = SorteoService.obtener_sorteo(sorteo_id)
+        if not sorteo:
+            raise HTTPException(status_code=404, detail="Sorteo no encontrado")
+        
+        imagen = SorteoService.obtener_imagen_sorteo(sorteo_id)
+        
+        if imagen:
+            return {"imagen": imagen}
+        else:
+            raise HTTPException(status_code=404, detail="Imagen no encontrada")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+@router.delete("/sorteos/{sorteo_id}/imagen")
+def eliminar_imagen_sorteo(sorteo_id: int):
+    """Elimina la imagen de un sorteo"""
+    try:
+        # Verificar que el sorteo existe
+        sorteo = SorteoService.obtener_sorteo(sorteo_id)
+        if not sorteo:
+            raise HTTPException(status_code=404, detail="Sorteo no encontrado")
+        
+        eliminada = SorteoService.eliminar_imagen_sorteo(sorteo_id)
+        
+        if eliminada:
+            return {"mensaje": "Imagen eliminada exitosamente"}
+        else:
+            raise HTTPException(status_code=404, detail="Imagen no encontrada")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
 

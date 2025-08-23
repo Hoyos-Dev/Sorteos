@@ -86,6 +86,7 @@
   min-height: 180px;
   box-sizing: border-box;
   transition: border 0.2s;
+  color: #475569;
 }
 
 .form-textarea:focus {
@@ -186,4 +187,8 @@
   background-color: #e8f5e8;
   color: #2e7d32;
   border: 1px solid #c8e6c9;
+}
+
+.button-carga {
+  margin-top: 4px;
 }

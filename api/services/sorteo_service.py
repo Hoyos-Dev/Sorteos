@@ -4,6 +4,9 @@ from typing import List, Optional, Tuple
 from config.database import DB_CONFIG
 from models.sorteo import Sorteo, SorteoResponse, DetalleSorteo, DetalleSorteoResponse, EstadoSorteo, EstadoParticipacion
 from models.participante import Participante, RegistroSorteoConParticipantesResponse
+import os
+import base64
+from fastapi import UploadFile
 # Importación removida para evitar dependencia circular
 
 class SorteoService:
@@ -348,7 +351,13 @@ class SorteoService:
             cursor.execute(query, (sorteo_id, documento_participante))
             connection.commit()
             
-            return cursor.rowcount > 0
+            eliminado = cursor.rowcount > 0
+            
+            # Compactar IDs después de eliminar para mantener consecutividad
+            if eliminado:
+                SorteoService._compact_detalle_sorteo_ids()
+            
+            return eliminado
             
         except mysql.connector.Error as e:
             print(f"Error eliminando participante del sorteo: {e}")
@@ -553,12 +562,12 @@ class SorteoService:
             cursor = connection.cursor(dictionary=True)
             
             query = """
-                SELECT s.id, s.nombre, s.descripcion, s.estado, s.fecha_creacion,
+                SELECT s.id, s.nombre, s.descripcion, s.estado, s.fecha_creacion, s.cantidad_premio,
                        COUNT(ds.id) as cantidad_participantes
                 FROM sorteo s
                 LEFT JOIN detalle_sorteo ds ON s.id = ds.id_sorteo
                 WHERE s.estado = 'activo'
-                GROUP BY s.id, s.nombre, s.descripcion, s.estado, s.fecha_creacion
+                GROUP BY s.id, s.nombre, s.descripcion, s.estado, s.fecha_creacion, s.cantidad_premio
                 ORDER BY s.fecha_creacion DESC
             """
             
@@ -636,23 +645,218 @@ class SorteoService:
         """Marca un participante como ganador en un sorteo"""
         try:
             connection = mysql.connector.connect(**DB_CONFIG)
-            cursor = connection.cursor()
+            cursor = connection.cursor(dictionary=True)
             
             fecha_actual = datetime.now()
+            print(f"Marcando ganador - Sorteo: {sorteo_id}, Documento: {documento_participante}, Fecha: {fecha_actual}")
             
-            query = """
+            # Verificar que el participante existe en el sorteo
+            verify_query = """
+                SELECT id, estado, fecha_ganador
+                FROM detalle_sorteo 
+                WHERE id_sorteo = %s AND documento_participante = %s
+            """
+            
+            cursor.execute(verify_query, (sorteo_id, documento_participante))
+            participante = cursor.fetchone()
+            
+            if not participante:
+                print(f"Error: Participante {documento_participante} no encontrado en sorteo {sorteo_id}")
+                return False
+            
+            print(f"Participante encontrado - ID: {participante['id']}, Estado actual: {participante['estado']}, Fecha ganador actual: {participante['fecha_ganador']}")
+            
+            # Actualizar el participante como ganador
+            update_query = """
                 UPDATE detalle_sorteo 
                 SET estado = %s, fecha_ganador = %s
                 WHERE id_sorteo = %s AND documento_participante = %s
             """
             
-            cursor.execute(query, (EstadoParticipacion.GANADOR.value, fecha_actual, sorteo_id, documento_participante))
+            cursor.execute(update_query, (EstadoParticipacion.GANADOR.value, fecha_actual, sorteo_id, documento_participante))
             connection.commit()
             
-            return cursor.rowcount > 0
+            if cursor.rowcount > 0:
+                # Verificar que la actualización fue exitosa
+                cursor.execute(verify_query, (sorteo_id, documento_participante))
+                participante_actualizado = cursor.fetchone()
+                
+                print(f"Actualización exitosa - Estado: {participante_actualizado['estado']}, Fecha ganador: {participante_actualizado['fecha_ganador']}")
+                
+                # Validar que fecha_ganador no sea NULL
+                if participante_actualizado['fecha_ganador'] is None:
+                    print(f"ERROR CRÍTICO: fecha_ganador es NULL después de la actualización")
+                    return False
+                
+                return True
+            else:
+                print(f"Error: No se pudo actualizar el participante")
+                return False
             
         except mysql.connector.Error as e:
             print(f"Error marcando participante como ganador: {e}")
+            return False
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
+    
+    @staticmethod
+    def actualizar_sorteo(sorteo_id: int, cantidad_premio: Optional[int] = None, imagen_fondo: Optional[str] = None, nombre: Optional[str] = None, descripcion: Optional[str] = None) -> Optional[SorteoResponse]:
+        """Actualiza la configuración de un sorteo"""
+        try:
+            connection = mysql.connector.connect(**DB_CONFIG)
+            cursor = connection.cursor(dictionary=True)
+            
+            # Construir la consulta de actualización dinámicamente
+            update_fields = []
+            params = []
+            
+            if cantidad_premio is not None:
+                update_fields.append("cantidad_premio = %s")
+                params.append(cantidad_premio)
+            
+            if imagen_fondo is not None:
+                update_fields.append("imagen = %s")
+                params.append(imagen_fondo)
+            
+            if nombre is not None:
+                update_fields.append("nombre = %s")
+                params.append(nombre)
+            
+            if descripcion is not None:
+                update_fields.append("descripcion = %s")
+                params.append(descripcion)
+            
+            if not update_fields:
+                # Si no hay campos para actualizar, solo retornar el sorteo actual
+                return SorteoService.obtener_sorteo(sorteo_id)
+            
+            # Agregar el ID del sorteo al final de los parámetros
+            params.append(sorteo_id)
+            
+            query = f"UPDATE sorteo SET {', '.join(update_fields)} WHERE id = %s"
+            print(f"Ejecutando query: {query}")
+            print(f"Con parámetros: {params}")
+            cursor.execute(query, params)
+            connection.commit()
+            
+            print(f"Filas afectadas: {cursor.rowcount}")
+            
+            if cursor.rowcount > 0:
+                # Retornar el sorteo actualizado
+                return SorteoService.obtener_sorteo(sorteo_id)
+            else:
+                print(f"No se actualizó ninguna fila para sorteo_id: {sorteo_id}")
+                # Verificar si el sorteo existe
+                sorteo_existente = SorteoService.obtener_sorteo(sorteo_id)
+                if sorteo_existente:
+                    print(f"El sorteo existe, pero no se actualizó. Sorteo actual: {sorteo_existente}")
+                    return sorteo_existente  # Retornar el sorteo existente aunque no se haya actualizado
+                else:
+                    print(f"El sorteo {sorteo_id} no existe")
+                    return None
+                
+        except mysql.connector.Error as e:
+            print(f"Error actualizando sorteo: {e}")
+            print(f"Query ejecutada: {query}")
+            print(f"Parámetros: {params}")
+            raise e
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
+    
+    @staticmethod
+    def guardar_imagen_sorteo(sorteo_id: int, file: UploadFile) -> Optional[str]:
+        """Guarda una imagen para un sorteo"""
+        try:
+            # Crear directorio de imágenes si no existe
+            images_dir = "images/sorteos"
+            os.makedirs(images_dir, exist_ok=True)
+            
+            # Generar nombre de archivo único
+            file_extension = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
+            filename = f"sorteo_{sorteo_id}.{file_extension}"
+            file_path = os.path.join(images_dir, filename)
+            
+            # Guardar archivo
+            with open(file_path, "wb") as buffer:
+                content = file.file.read()
+                buffer.write(content)
+            
+            # Actualizar la base de datos con la ruta de la imagen
+            connection = mysql.connector.connect(**DB_CONFIG)
+            cursor = connection.cursor()
+            
+            query = "UPDATE sorteo SET imagen = %s WHERE id = %s"
+            cursor.execute(query, (file_path, sorteo_id))
+            connection.commit()
+            
+            return file_path
+            
+        except Exception as e:
+            print(f"Error guardando imagen: {e}")
+            return None
+        finally:
+            if 'connection' in locals() and connection.is_connected():
+                cursor.close()
+                connection.close()
+    
+    @staticmethod
+    def obtener_imagen_sorteo(sorteo_id: int) -> Optional[str]:
+        """Obtiene la imagen de un sorteo en formato base64"""
+        try:
+            connection = mysql.connector.connect(**DB_CONFIG)
+            cursor = connection.cursor(dictionary=True)
+            
+            query = "SELECT imagen FROM sorteo WHERE id = %s"
+            cursor.execute(query, (sorteo_id,))
+            result = cursor.fetchone()
+            
+            if result and result['imagen'] and os.path.exists(result['imagen']):
+                with open(result['imagen'], "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+                    return encoded_string
+            
+            return None
+            
+        except Exception as e:
+            print(f"Error obteniendo imagen: {e}")
+            return None
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
+    
+    @staticmethod
+    def eliminar_imagen_sorteo(sorteo_id: int) -> bool:
+        """Elimina la imagen de un sorteo"""
+        try:
+            connection = mysql.connector.connect(**DB_CONFIG)
+            cursor = connection.cursor(dictionary=True)
+            
+            # Obtener la ruta de la imagen actual
+            query = "SELECT imagen FROM sorteo WHERE id = %s"
+            cursor.execute(query, (sorteo_id,))
+            result = cursor.fetchone()
+            
+            if result and result['imagen']:
+                # Eliminar archivo físico si existe
+                if os.path.exists(result['imagen']):
+                    os.remove(result['imagen'])
+                
+                # Actualizar base de datos
+                update_query = "UPDATE sorteo SET imagen = NULL WHERE id = %s"
+                cursor.execute(update_query, (sorteo_id,))
+                connection.commit()
+                
+                return True
+            
+            return False
+            
+        except Exception as e:
+            print(f"Error eliminando imagen: {e}")
             return False
         finally:
             if connection.is_connected():

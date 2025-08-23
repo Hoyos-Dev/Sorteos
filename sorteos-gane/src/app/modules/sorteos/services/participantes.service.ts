@@ -66,7 +66,7 @@ export interface Ganador {
   providedIn: 'root'
 })
 export class ParticipantesService {
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'http://localhost:8001';
   private sorteoCreado = new Subject<void>();
   private ganadorMarcado = new Subject<void>();
 

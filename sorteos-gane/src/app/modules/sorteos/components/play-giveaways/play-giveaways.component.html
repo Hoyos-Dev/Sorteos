@@ -1,4 +1,4 @@
-<div class="jugar-bg">
+<div class="jugar-bg" [ngStyle]="sorteoImagen ? {'background-image': 'url(' + sorteoImagen + ')'} : {}">
   <div class="cuadro-blanco">
     <div class="participante-info">
       <h2 class="participante-nombre" [innerHTML]="nombreAnimadoHTML"></h2>

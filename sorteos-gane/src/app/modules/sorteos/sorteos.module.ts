@@ -10,6 +10,7 @@ import { ListGiveawaysComponent } from './components/list-giveaways/list-giveawa
 import { PlayGiveawaysComponent } from './components/play-giveaways/play-giveaways.component';
 import { UploadFileComponent } from './components/upload-file/upload-file.component';
 import { InfoGiveawayComponent } from './components/info-giveaway/info-giveaway.component';
+import { SettingsGiveawayComponent } from './components/settings-giveaway/settings-giveaway.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { InfoGiveawayComponent } from './components/info-giveaway/info-giveaway.
     ListGiveawaysComponent,
     PlayGiveawaysComponent,
     UploadFileComponent,
-    InfoGiveawayComponent
+    InfoGiveawayComponent,
+    SettingsGiveawayComponent
   ],
   imports: [
     CommonModule,

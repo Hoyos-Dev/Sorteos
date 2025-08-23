@@ -23,6 +23,7 @@ class Sorteo(BaseModel):
     fecha_creacion: Optional[datetime] = None
     fecha_finalizacion: Optional[datetime] = None
     cantidad_premio: Optional[int] = None
+    imagen: Optional[str] = None
 
 class SorteoResponse(BaseModel):
     id: int
@@ -32,6 +33,7 @@ class SorteoResponse(BaseModel):
     fecha_creacion: datetime
     fecha_finalizacion: Optional[datetime]
     cantidad_premio: Optional[int]
+    imagen: Optional[str] = None
 
 class DetalleSorteo(BaseModel):
     id: Optional[int] = None
@@ -69,3 +71,4 @@ class SorteoListResponse(BaseModel):
     estado: EstadoSorteo
     fecha_creacion: datetime
     cantidad_participantes: int
+    cantidad_premio: Optional[int] = None

@@ -44,11 +44,11 @@
            <div class="info-items"> 
              <div class="info-item"> 
                <span class="label">Premios configurados</span> 
-               <span class="value">{{ sorteoDetalle?.cantidadPremio || sorteo?.cantidadPremio || 1 }}</span> 
+               <span class="value">{{ sorteoDetalle?.cantidad_premio || sorteo?.cantidad_premio || sorteoDetalle?.cantidadPremio || sorteo?.cantidadPremio || 1 }}</span> 
              </div> 
              <div class="info-item"> 
                <span class="label">Progreso de ganadores</span> 
-               <span class="value">{{ (sorteoDetalle?.ganadores?.length || ganadores?.length || 0) }}/{{ (sorteoDetalle?.cantidadPremio || sorteo?.cantidadPremio || 1) }}</span> 
+               <span class="value">{{ (sorteoDetalle?.ganadores?.length || ganadores.length || 0) }}/{{ (sorteoDetalle?.cantidad_premio || sorteo?.cantidad_premio || sorteoDetalle?.cantidadPremio || sorteo?.cantidadPremio || 1) }}</span> 
              </div> 
            </div> 
          </div> 

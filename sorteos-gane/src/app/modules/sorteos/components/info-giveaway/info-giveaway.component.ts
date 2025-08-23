@@ -35,6 +35,10 @@ export class InfoGiveawayComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['sorteo'] && this.sorteo) || (changes['sorteoDetalle'] && this.sorteoDetalle)) {
+      console.log('Info-giveaway - sorteo completo:', JSON.stringify(this.sorteo, null, 2));
+      console.log('Info-giveaway - sorteoDetalle completo:', JSON.stringify(this.sorteoDetalle, null, 2));
+      console.log('Info-giveaway - cantidad_premio del sorteo:', this.sorteo?.cantidad_premio);
+      console.log('Info-giveaway - cantidadPremio del sorteo:', this.sorteo?.cantidadPremio);
       this.cargarGanadores();
     }
   }

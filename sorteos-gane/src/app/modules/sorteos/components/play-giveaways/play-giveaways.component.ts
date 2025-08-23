@@ -24,6 +24,7 @@ export class PlayGiveawaysComponent implements OnInit {
   sorteoId: string | null = null;
   sorteoInfo: SorteoListResponse | null = null;
   ganadoresActuales: number = 0;
+  sorteoImagen: string | null = null;
 
   constructor(
     private location: Location,
@@ -55,6 +56,7 @@ export class PlayGiveawaysComponent implements OnInit {
           if (this.sorteoInfo) {
             console.log('Información del sorteo cargada:', this.sorteoInfo);
             this.cargarGanadoresActuales();
+            this.cargarImagenSorteo();
           }
         },
         error: (error) => {
@@ -154,9 +156,9 @@ export class PlayGiveawaysComponent implements OnInit {
     }
     
     console.log('Iniciando juego para sorteo:', this.sorteoId);
-    console.log('URL del endpoint:', `http://localhost:8000/obtener-participante-aleatorio/${this.sorteoId}`);
+    console.log('URL del endpoint:', `http://localhost:8001/obtener-participante-aleatorio/${this.sorteoId}`);
 
-    this.http.get<any>(`http://localhost:8000/obtener-participante-aleatorio/${this.sorteoId}`).subscribe({
+    this.http.get<any>(`http://localhost:8001/obtener-participante-aleatorio/${this.sorteoId}`).subscribe({
       next: (response) => {
         console.log('Respuesta del servidor:', response);
         if (response.ok && response.participante) {
@@ -264,9 +266,57 @@ export class PlayGiveawaysComponent implements OnInit {
           
           // Recargar el conteo real de ganadores desde el servidor
           this.cargarGanadoresActuales();
+          
+          // Validar que la fecha_ganador se actualizó correctamente
+          this.validarFechaGanador();
         },
         error: (error) => {
           console.error('Error marcando participante como ganador:', error);
+        }
+      });
+    }
+  }
+
+  private validarFechaGanador(): void {
+    if (this.participanteActual && this.sorteoId) {
+      // Esperar un momento para que se complete la actualización
+      setTimeout(() => {
+        this.participantesService.obtenerGanadoresPorSorteo(Number(this.sorteoId)).subscribe({
+          next: (ganadores) => {
+            const ganadorActual = ganadores.find(g => g.documento_participante === this.participanteActual?.documento);
+            
+            if (ganadorActual) {
+              if (ganadorActual.fecha_ganador) {
+                console.log('✅ Validación exitosa - Fecha ganador actualizada:', ganadorActual.fecha_ganador);
+              } else {
+                console.error('❌ ERROR: fecha_ganador es NULL para el ganador:', ganadorActual.documento_participante);
+                // Mostrar alerta al usuario
+                alert('Error: La fecha del ganador no se actualizó correctamente. Por favor, contacte al administrador.');
+              }
+            } else {
+              console.error('❌ ERROR: No se encontró el ganador en la lista de ganadores');
+            }
+          },
+          error: (error) => {
+            console.error('Error validando fecha_ganador:', error);
+          }
+        });
+      }, 1000); // Esperar 1 segundo
+    }
+  }
+
+  private cargarImagenSorteo(): void {
+    if (this.sorteoId) {
+      this.http.get<any>(`http://localhost:8001/sorteos/${this.sorteoId}/imagen`).subscribe({
+        next: (response) => {
+          if (response && response.imagen) {
+            this.sorteoImagen = `data:image/jpeg;base64,${response.imagen}`;
+            console.log('Imagen del sorteo cargada exitosamente');
+          }
+        },
+        error: (error) => {
+          console.log('No se encontró imagen para el sorteo o error al cargar:', error);
+          this.sorteoImagen = null;
         }
       });
     }
