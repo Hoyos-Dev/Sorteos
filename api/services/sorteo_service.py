@@ -562,12 +562,12 @@ class SorteoService:
             cursor = connection.cursor(dictionary=True)
             
             query = """
-                SELECT s.id, s.nombre, s.descripcion, s.estado, s.fecha_creacion, s.cantidad_premio,
+                SELECT s.id, s.nombre, s.descripcion, s.estado, s.fecha_creacion, s.cantidad_premio, s.ganadores_simultaneos,
                        COUNT(ds.id) as cantidad_participantes
                 FROM sorteo s
                 LEFT JOIN detalle_sorteo ds ON s.id = ds.id_sorteo
                 WHERE s.estado = 'activo'
-                GROUP BY s.id, s.nombre, s.descripcion, s.estado, s.fecha_creacion, s.cantidad_premio
+                GROUP BY s.id, s.nombre, s.descripcion, s.estado, s.fecha_creacion, s.cantidad_premio, s.ganadores_simultaneos
                 ORDER BY s.fecha_creacion DESC
             """
             
@@ -702,7 +702,7 @@ class SorteoService:
                 connection.close()
     
     @staticmethod
-    def actualizar_sorteo(sorteo_id: int, cantidad_premio: Optional[int] = None, imagen_fondo: Optional[str] = None, nombre: Optional[str] = None, descripcion: Optional[str] = None) -> Optional[SorteoResponse]:
+    def actualizar_sorteo(sorteo_id: int, cantidad_premio: Optional[int] = None, ganadores_simultaneos: Optional[int] = None, imagen_fondo: Optional[str] = None, nombre: Optional[str] = None, descripcion: Optional[str] = None) -> Optional[SorteoResponse]:
         """Actualiza la configuración de un sorteo"""
         try:
             connection = mysql.connector.connect(**DB_CONFIG)
@@ -715,6 +715,10 @@ class SorteoService:
             if cantidad_premio is not None:
                 update_fields.append("cantidad_premio = %s")
                 params.append(cantidad_premio)
+            
+            if ganadores_simultaneos is not None:
+                update_fields.append("ganadores_simultaneos = %s")
+                params.append(ganadores_simultaneos)
             
             if imagen_fondo is not None:
                 update_fields.append("imagen = %s")

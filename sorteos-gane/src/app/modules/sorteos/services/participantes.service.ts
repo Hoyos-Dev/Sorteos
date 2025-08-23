@@ -50,6 +50,7 @@ export interface SorteoListResponse {
   fecha_creacion: string;
   cantidad_participantes: number;
   cantidad_premio: number;
+  ganadores_simultaneos: number;
 }
 
 export interface Ganador {

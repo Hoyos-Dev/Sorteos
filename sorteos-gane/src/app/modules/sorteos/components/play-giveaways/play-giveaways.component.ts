@@ -25,6 +25,12 @@ export class PlayGiveawaysComponent implements OnInit {
   sorteoInfo: SorteoListResponse | null = null;
   ganadoresActuales: number = 0;
   sorteoImagen: string | null = null;
+  
+  // Nuevas propiedades para múltiples ganadores
+  ganadoresSimultaneos: (Participante | null)[] = [];
+  nombresAnimados: string[] = [];
+  nombresAnimadosHTML: string[] = [];
+  cuadrosGanadores: number = 1;
 
   constructor(
     private location: Location,
@@ -41,7 +47,6 @@ export class PlayGiveawaysComponent implements OnInit {
       this.cargarSorteoInfo();
     }
     
-    console.log('Sorteo ID recibido:', this.sorteoId);
     if (!this.sorteoId) {
       console.error('No se encontró el ID del sorteo en los parámetros de ruta');
     }
@@ -53,10 +58,20 @@ export class PlayGiveawaysComponent implements OnInit {
       this.participantesService.obtenerTodosLosSorteos().subscribe({
         next: (sorteos) => {
           this.sorteoInfo = sorteos.find(s => s.id.toString() === this.sorteoId) || null;
+          
           if (this.sorteoInfo) {
-            console.log('Información del sorteo cargada:', this.sorteoInfo);
+            // Configurar número de cuadros según ganadores_simultaneos
+            this.cuadrosGanadores = this.sorteoInfo.ganadores_simultaneos || 1;
+            
+            // Inicializar arrays para múltiples ganadores
+            this.ganadoresSimultaneos = new Array(this.cuadrosGanadores).fill(null);
+            this.nombresAnimados = new Array(this.cuadrosGanadores).fill('');
+            this.nombresAnimadosHTML = new Array(this.cuadrosGanadores).fill('');
+            
             this.cargarGanadoresActuales();
             this.cargarImagenSorteo();
+          } else {
+            console.error('No se encontró el sorteo con ID:', this.sorteoId);
           }
         },
         error: (error) => {
@@ -158,34 +173,91 @@ export class PlayGiveawaysComponent implements OnInit {
     console.log('Iniciando juego para sorteo:', this.sorteoId);
     console.log('URL del endpoint:', `http://localhost:8001/obtener-participante-aleatorio/${this.sorteoId}`);
 
-    this.http.get<any>(`http://localhost:8001/obtener-participante-aleatorio/${this.sorteoId}`).subscribe({
-      next: (response) => {
-        console.log('Respuesta del servidor:', response);
-        if (response.ok && response.participante) {
-          console.log('Participante obtenido:', response.participante);
-          this.participanteActual = response.participante;
-          this.juegoIniciado = true;
-          if (this.participanteActual) {
-            console.log('Iniciando animación para:', this.participanteActual.nombre);
-            this.animarNombre(this.participanteActual.nombre.toUpperCase());
+    // Obtener múltiples participantes según la configuración
+    this.obtenerMultiplesParticipantes();
+  }
+
+  private obtenerMultiplesParticipantes(): void {
+    const participantesObtenidos: Participante[] = [];
+    let participantesRestantes = this.cuadrosGanadores;
+    
+    const obtenerSiguienteParticipante = () => {
+      if (participantesRestantes <= 0) {
+        // Todos los participantes obtenidos, iniciar animaciones
+        this.procesarGanadoresSimultaneos(participantesObtenidos);
+        return;
+      }
+      
+      this.http.get<any>(`http://localhost:8001/obtener-participante-aleatorio/${this.sorteoId}`).subscribe({
+        next: (response) => {
+          console.log('Respuesta del servidor:', response);
+          if (response.ok && response.participante) {
+            console.log('Participante obtenido:', response.participante);
+            participantesObtenidos.push(response.participante);
+            participantesRestantes--;
+            // Obtener siguiente participante
+            setTimeout(() => obtenerSiguienteParticipante(), 100);
+          } else {
+            // No hay más participantes disponibles
+            console.log('No hay más participantes disponibles para el sorteo');
+            this.procesarGanadoresSimultaneos(participantesObtenidos);
           }
-          // Marcar como ganador automáticamente
-          this.marcarGanador();
-        } else {
-          // Si no hay participantes disponibles, limpiar la pantalla
-          this.participanteActual = null;
-          this.nombreAnimado = '';
-          this.nombreAnimadoHTML = '';
-          this.juegoIniciado = false;
-          console.log('No hay más participantes disponibles para el sorteo');
+        },
+        error: (error) => {
+          console.error('Error al obtener participante:', error);
+          participantesRestantes--;
+          // Continuar con el siguiente aunque haya error
+          setTimeout(() => obtenerSiguienteParticipante(), 100);
         }
-      },
-      error: (error) => {
-        console.error('Error al obtener participante:', error);
-        console.error('Detalles del error:', error.message);
-        console.error('Status del error:', error.status);
+      });
+    };
+    
+    obtenerSiguienteParticipante();
+  }
+
+  private procesarGanadoresSimultaneos(participantes: Participante[]): void {
+    if (participantes.length === 0) {
+      // No hay participantes, limpiar pantalla
+      this.limpiarPantalla();
+      return;
+    }
+    
+    // Asignar participantes a los cuadros
+    for (let i = 0; i < this.cuadrosGanadores; i++) {
+      if (i < participantes.length) {
+        this.ganadoresSimultaneos[i] = participantes[i];
+        this.nombresAnimados[i] = '';
+        this.nombresAnimadosHTML[i] = '';
+      } else {
+        this.ganadoresSimultaneos[i] = null;
+        this.nombresAnimados[i] = '';
+        this.nombresAnimadosHTML[i] = '';
+      }
+    }
+    
+    this.juegoIniciado = true;
+    
+    // Iniciar animaciones para todos los participantes
+    participantes.forEach((participante, index) => {
+      if (participante) {
+        console.log(`Iniciando animación para cuadro ${index + 1}:`, participante.nombre);
+        this.animarNombreEnCuadro(participante.nombre.toUpperCase(), index);
       }
     });
+    
+    // Marcar todos como ganadores
+    this.marcarMultiplesGanadores(participantes);
+  }
+
+  private limpiarPantalla(): void {
+    this.participanteActual = null;
+    this.nombreAnimado = '';
+    this.nombreAnimadoHTML = '';
+    this.ganadoresSimultaneos = new Array(this.cuadrosGanadores).fill(null);
+    this.nombresAnimados = new Array(this.cuadrosGanadores).fill('');
+    this.nombresAnimadosHTML = new Array(this.cuadrosGanadores).fill('');
+    this.juegoIniciado = false;
+    console.log('No hay más participantes disponibles para el sorteo');
   }
 
   animarNombre(nombreCompleto: string): void {
@@ -275,6 +347,97 @@ export class PlayGiveawaysComponent implements OnInit {
         }
       });
     }
+  }
+
+  private marcarMultiplesGanadores(participantes: Participante[]): void {
+    if (!this.sorteoId) return;
+    
+    participantes.forEach(participante => {
+      if (participante) {
+        console.log('Marcando ganador:', participante.documento);
+        this.participantesService.marcarGanador(Number(this.sorteoId), participante.documento).subscribe({
+          next: (response) => {
+            console.log('Participante marcado como ganador:', response);
+          },
+          error: (error) => {
+            console.error('Error marcando participante como ganador:', error);
+          }
+        });
+      }
+    });
+    
+    // Recargar el conteo real de ganadores desde el servidor
+    setTimeout(() => {
+      this.cargarGanadoresActuales();
+    }, 1000);
+  }
+
+  animarNombreEnCuadro(nombreCompleto: string, cuadroIndex: number): void {
+    // Inicializar con letras aleatorias diferentes para cada posición
+    this.nombresAnimados[cuadroIndex] = '';
+    const posicionesIniciales: number[] = [];
+    for (let i = 0; i < nombreCompleto.length; i++) {
+      if (nombreCompleto[i] === ' ') {
+        this.nombresAnimados[cuadroIndex] += ' ';
+        posicionesIniciales.push(-1); // -1 para espacios
+      } else {
+        const posicionAleatoria = Math.floor(Math.random() * this.abecedario.length);
+        this.nombresAnimados[cuadroIndex] += this.abecedario[posicionAleatoria];
+        posicionesIniciales.push(posicionAleatoria);
+      }
+    }
+    
+    let cicloActual = 0;
+    const ciclosPorLetra = 5; // Ciclos antes de que cada letra se detenga
+    let letrasFijas: boolean[] = new Array(nombreCompleto.length).fill(false);
+    
+    const animarTodasLasLetras = () => {
+      if (cicloActual < nombreCompleto.length * ciclosPorLetra) {
+        let nombreTemporal = '';
+        
+        for (let i = 0; i < nombreCompleto.length; i++) {
+          if (nombreCompleto[i] === ' ') {
+            nombreTemporal += ' ';
+          } else {
+            // Calcular si esta letra ya debe estar fija
+            const cicloParaDetener = i * ciclosPorLetra;
+            if (cicloActual >= cicloParaDetener) {
+              nombreTemporal += nombreCompleto[i];
+              letrasFijas[i] = true;
+            } else {
+              // Generar letra aleatoria
+              const nuevaPosicion = Math.floor(Math.random() * this.abecedario.length);
+              nombreTemporal += this.abecedario[nuevaPosicion];
+            }
+          }
+        }
+        
+        this.nombresAnimados[cuadroIndex] = nombreTemporal;
+        this.actualizarHTMLCuadro(cuadroIndex);
+        cicloActual++;
+        
+        setTimeout(animarTodasLasLetras, 100); // Velocidad de animación
+      } else {
+        // Animación completada
+        this.nombresAnimados[cuadroIndex] = nombreCompleto;
+        this.actualizarHTMLCuadro(cuadroIndex);
+      }
+    };
+    
+    animarTodasLasLetras();
+  }
+
+  actualizarHTMLCuadro(cuadroIndex: number): void {
+    let html = '';
+    const nombreAnimado = this.nombresAnimados[cuadroIndex];
+    for (let i = 0; i < nombreAnimado.length; i++) {
+      if (nombreAnimado[i] === ' ') {
+        html += '<span class="letra">&nbsp;</span>';
+      } else {
+        html += `<span class="letra">${nombreAnimado[i]}</span>`;
+      }
+    }
+    this.nombresAnimadosHTML[cuadroIndex] = html;
   }
 
   private validarFechaGanador(): void {

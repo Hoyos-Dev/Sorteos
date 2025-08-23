@@ -27,6 +27,7 @@ def obtener_todos_los_sorteos():
 # Request model for updating sorteo
 class UpdateSorteoRequest(BaseModel):
     cantidad_premio: Optional[int] = None
+    ganadores_simultaneos: Optional[int] = None
     imagen_fondo: Optional[str] = None
     nombre: Optional[str] = None
     descripcion: Optional[str] = None
@@ -43,7 +44,8 @@ def actualizar_sorteo(sorteo_id: int, request: UpdateSorteoRequest):
         # Actualizar el sorteo
         sorteo_actualizado = SorteoService.actualizar_sorteo(
             sorteo_id, 
-            request.cantidad_premio, 
+            request.cantidad_premio,
+            request.ganadores_simultaneos,
             request.imagen_fondo,
             request.nombre,
             request.descripcion

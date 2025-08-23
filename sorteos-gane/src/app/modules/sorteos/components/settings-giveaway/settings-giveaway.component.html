@@ -33,6 +33,23 @@
           <p class="help-text">Define cuántas personas pueden ganar en este sorteo</p>
         </div>
 
+        <!-- Configuración de ganadores simultáneos -->
+        <div class="form-group">
+          <label for="ganadoresSimultaneos">Ganadores simultáneos</label>
+          <div class="input-container">
+            <mat-icon class="input-icon">groups</mat-icon>
+            <input 
+              type="number" 
+              id="ganadoresSimultaneos" 
+              [(ngModel)]="ganadoresSimultaneos" 
+              min="1" 
+              max="5"
+              class="form-input"
+              placeholder="Cuadros blancos a mostrar">
+          </div>
+          <p class="help-text">Cuántos cuadros blancos aparecerán al presionar J (máximo 5)</p>
+        </div>
+
         <!-- Subida de imagen -->
         <div class="form-group">
           <label for="imageUpload">Imagen del sorteo</label>

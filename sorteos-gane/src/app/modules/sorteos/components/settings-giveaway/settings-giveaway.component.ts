@@ -14,6 +14,7 @@ export class SettingsGiveawayComponent implements OnChanges {
   @Output() sorteoUpdated = new EventEmitter<any>();
 
   cantidadPremio: number = 1;
+  ganadoresSimultaneos: number = 1;
   selectedImage: File | null = null;
   imagePreview: string | null = null;
   isLoading: boolean = false;
@@ -23,6 +24,7 @@ export class SettingsGiveawayComponent implements OnChanges {
   ngOnChanges(): void {
     if (this.sorteo) {
       this.cantidadPremio = this.sorteo.cantidad_premio || 1;
+      this.ganadoresSimultaneos = this.sorteo.ganadores_simultaneos || 1;
     }
   }
 
@@ -60,9 +62,10 @@ export class SettingsGiveawayComponent implements OnChanges {
 
     this.isLoading = true;
     
-    // Actualizar cantidad de premio
+    // Actualizar cantidad de premio y ganadores simultáneos
     this.sorteosService.updateSorteo(this.sorteoId, {
-      cantidad_premio: this.cantidadPremio
+      cantidad_premio: this.cantidadPremio,
+      ganadores_simultaneos: this.ganadoresSimultaneos
     }).subscribe({
       next: (response) => {
         console.log('Sorteo actualizado:', response);
@@ -95,7 +98,8 @@ export class SettingsGiveawayComponent implements OnChanges {
     this.sorteoUpdated.emit({
       ...this.sorteo,
       cantidad_premio: this.cantidadPremio,
-      cantidadPremio: this.cantidadPremio  // Para compatibilidad con el frontend
+      cantidadPremio: this.cantidadPremio,  // Para compatibilidad con el frontend
+      ganadores_simultaneos: this.ganadoresSimultaneos
     });
 
     this.isLoading = false;

@@ -17,6 +17,31 @@
 
 // Estilos removidos - la imagen ahora se usa como fondo
 
+// Contenedor para múltiples cuadros
+.contenedor-multiples-cuadros {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+// Estilos para cuadros múltiples
+.cuadro-blanco-multiple {
+  background-color: white;
+  width: 1800px;
+  height: 120px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
 .cuadro-blanco {
   background-color: white;
   width: 1800px;
@@ -135,5 +160,16 @@
     text-align: center;
     overflow: hidden;
     box-sizing: border-box;
+  }
+  
+  // Estilos responsivos para cuadros múltiples
+  .contenedor-multiples-cuadros {
+    gap: 20px;
+  }
+  
+  .cuadro-blanco-multiple {
+    width: 1000px;
+    height: 80px;
+    border-radius: 15px;
   }
 }
