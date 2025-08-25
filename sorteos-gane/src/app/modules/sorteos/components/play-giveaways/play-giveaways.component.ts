@@ -235,18 +235,37 @@ export class PlayGiveawaysComponent implements OnInit {
       }
     }
     
+    // Para sorteos individuales, también actualizar las variables del sorteo único
+    if (this.cuadrosGanadores === 1 && participantes.length > 0) {
+      this.participanteActual = participantes[0];
+      this.nombreAnimado = '';
+      this.nombreAnimadoHTML = '';
+    }
+    
     this.juegoIniciado = true;
     
     // Iniciar animaciones para todos los participantes
     participantes.forEach((participante, index) => {
       if (participante) {
         console.log(`Iniciando animación para cuadro ${index + 1}:`, participante.nombre);
-        this.animarNombreEnCuadro(participante.nombre.toUpperCase(), index);
+        if (this.cuadrosGanadores === 1) {
+          // Para sorteos individuales, usar la animación original
+          this.animarNombre(participante.nombre.toUpperCase());
+        } else {
+          // Para sorteos múltiples, usar la animación por cuadro
+          this.animarNombreEnCuadro(participante.nombre.toUpperCase(), index);
+        }
       }
     });
     
     // Marcar todos como ganadores
-    this.marcarMultiplesGanadores(participantes);
+    if (this.cuadrosGanadores === 1 && participantes.length > 0) {
+      // Para sorteos individuales, usar el método original
+      this.marcarGanador();
+    } else {
+      // Para sorteos múltiples, usar el método múltiple
+      this.marcarMultiplesGanadores(participantes);
+    }
   }
 
   private limpiarPantalla(): void {

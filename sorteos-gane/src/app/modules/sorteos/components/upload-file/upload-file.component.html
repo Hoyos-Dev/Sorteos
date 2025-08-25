@@ -1,13 +1,26 @@
 <div class="modal-overlay" *ngIf="isVisible" (click)="onCloseModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-body">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <div class="modal-icon">
+          <mat-icon>upload_file</mat-icon>
+        </div>
+        <div class="header-text">
+          <h2>Cargar Participantes</h2>
+          <p class="subtitle">Importar desde archivo Excel</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
       <div class="upload-container"> 
         <div class="upload-description"> 
           <p>Selecciona o arrastra un archivo Excel (.xlsx, .xls) con las siguientes columnas:</p> 
           <ul> 
             <li><strong>DOCUMENTO:</strong> Número de documento del participante</li> 
             <li><strong>NOMBRE:</strong> Nombre completo del participante</li> 
-            <li><strong>ESTADO:</strong> P (Presente) o G (Ganador) - Opcional</li> 
           </ul> 
         </div> 
         
@@ -49,7 +62,7 @@
           <small>({{ formatFileSize(selectedFile.size) }})</small>
         </div>
         <button class="remove-file" (click)="removeFile()">
-          <i class="fas fa-trash"></i>
+          <i class="fas fa-trash"><mat-icon>close</mat-icon></i>
         </button>
       </div>
       
@@ -59,19 +72,21 @@
         </div>
         <span class="progress-text">{{ uploadProgress }}%</span>
       </div>
-    </div>
-    
-    <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="onCloseModal()" [disabled]="isUploading">
-        Cancelar
-      </button>
-      <button 
-        class="btn btn-primary" 
-        (click)="uploadFile()" 
-        [disabled]="!selectedFile || isUploading">
-        <i class="fas fa-upload"></i>
-        {{ isUploading ? 'Subiendo...' : 'Subir Archivo' }}
-      </button>
+      
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="onCloseModal()" [disabled]="isUploading">
+          <mat-icon>close</mat-icon>
+          Cancelar
+        </button>
+        <button 
+          class="btn btn-primary" 
+          (click)="uploadFile()" 
+          [disabled]="!selectedFile || isUploading">
+          <mat-icon>upload</mat-icon>
+          {{ isUploading ? 'Subiendo...' : 'Subir Archivo' }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

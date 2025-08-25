@@ -1,6 +1,13 @@
 <div class="list-giveaways-container">
   <div class="giveaway-card" *ngFor="let sorteo of sorteos" [style.border-left-color]="getStatusBorderColor(sorteo)">
     <div class="card-content" (click)="onCardClick(sorteo)">
+      <!-- Status card -->
+      <div class="status-card">
+        <div class="status-indicator" [ngClass]="getStatusClass(sorteo)">
+          <div class="status-dot" [ngClass]="getStatusClass(sorteo)"></div>
+          <span class="status-text">{{ getStatusText(sorteo) }}</span>
+        </div>
+      </div>
       <h3 class="card-title">{{ sorteo.nombre }}</h3>
       <p class="card-description">{{ sorteo.descripcion }}</p>
       <div class="card-stats">

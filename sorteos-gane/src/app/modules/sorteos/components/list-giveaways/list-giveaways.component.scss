@@ -1,16 +1,20 @@
 .list-giveaways-container {
-  padding: 20px;
+  padding: 20px 20px 20px 20px;
   font-family: 'Poppins', sans-serif;
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  position: relative;
+  scroll-behavior: smooth;
 }
 
 .giveaway-card {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 8px;
   padding: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
@@ -46,7 +50,6 @@
 }
 
 .card-title {
-  font-family: 'Poppins', sans-serif;
   font-size: 1.1rem;
   font-weight: 600;
   color: #003594;
@@ -55,7 +58,6 @@
 }
 
 .card-description {
-  font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
   color: #666;
   margin: 0 0 10px 0;
@@ -111,6 +113,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
+  margin-bottom: 30px;
 }
 
 .menu-button:hover {
@@ -188,10 +191,85 @@
   &:hover {
     background: #f8f9fa;
     color: #495057;
-    
-    mat-icon {
-      color: #495057;
-    }
+  }
+}
+
+// Status card styles
+.status-card {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 4px 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-text {
+  font-size: 10px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.3px;
+}
+
+// Estado Activo (Verde)
+.status-activo .status-dot {
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+}
+
+.status-activo .status-indicator {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+// Estado Sin Configurar/Pendiente (Azul)
+.status-sin-configurar .status-dot {
+  background-color: #003594;
+  box-shadow: 0 0 0 0 rgba(0, 53, 148, 0.7);
+}
+
+.status-sin-configurar .status-indicator {
+  border-color: rgba(0, 53, 148, 0.3);
+}
+
+// Estado Finalizado (Rojo)
+.status-finalizado .status-dot {
+  background-color: #d32f2f;
+  box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7);
+}
+
+.status-finalizado .status-indicator {
+  border-color: rgba(211, 47, 47, 0.3);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 3px transparent;
+  }
+  
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 currentColor;
   }
 }
 

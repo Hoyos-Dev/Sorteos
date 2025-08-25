@@ -189,4 +189,60 @@ export class ListGiveawaysComponent implements OnInit, OnDestroy {
     return '#4caf50';
   }
 
+  // Método para obtener la clase CSS del estado
+  getStatusClass(sorteo: SorteoListResponse): string {
+    // Sorteo finalizado → Rojo
+    if (sorteo.estado === 'finalizado') {
+      return 'status-finalizado';
+    }
+    
+    // Sorteo sin configurar (cantidad_premio = 0 o null) → Azul
+    if (!sorteo.cantidad_premio || sorteo.cantidad_premio === 0) {
+      return 'status-sin-configurar';
+    }
+    
+    const cantidadGanadores = this.ganadoresPorSorteo[sorteo.id] || 0;
+    
+    // Sorteo completo (ganadores >= premios) → Rojo
+    if (cantidadGanadores >= sorteo.cantidad_premio) {
+      return 'status-finalizado';
+    }
+    
+    // Sorteo sin ganadores (0/N) → Azul (no iniciado)
+    if (cantidadGanadores === 0) {
+      return 'status-sin-configurar';
+    }
+    
+    // Sorteo con ganadores pero no completo (X/N donde X > 0 y X < N) → Verde
+    return 'status-activo';
+  }
+
+  // Método para obtener el texto del estado
+  getStatusText(sorteo: SorteoListResponse): string {
+    // Sorteo finalizado → FINALIZADO
+    if (sorteo.estado === 'finalizado') {
+      return 'FINALIZADO';
+    }
+    
+    // Sorteo sin configurar (cantidad_premio = 0 o null) → SIN CONFIGURAR
+    if (!sorteo.cantidad_premio || sorteo.cantidad_premio === 0) {
+      return 'SIN CONFIGURAR';
+    }
+    
+    const cantidadGanadores = this.ganadoresPorSorteo[sorteo.id] || 0;
+    
+    // Sorteo completo (ganadores >= premios) → FINALIZADO
+    if (cantidadGanadores >= sorteo.cantidad_premio) {
+      return 'FINALIZADO';
+    }
+    
+    // Sorteo sin ganadores (0/N) → PENDIENTE (no iniciado)
+    if (cantidadGanadores === 0) {
+      return 'PENDIENTE';
+    }
+    
+    // Sorteo con ganadores pero no completo (X/N donde X > 0 y X < N) → ACTIVO
+    return 'ACTIVO';
+  }
+
 }
