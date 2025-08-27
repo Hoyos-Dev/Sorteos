@@ -5,9 +5,19 @@
   box-sizing: border-box;
   overflow-x: hidden;
   max-height: calc(100vh - 120px);
-  overflow-y: auto;
+  overflow-y: auto; /* mantiene el scroll pero lo ocultamos visualmente */
   position: relative;
   scroll-behavior: smooth;
+}
+
+/* Ocultar visualmente la barra de scroll (manteniendo el desplazamiento) */
+.list-giveaways-container::-webkit-scrollbar {
+  display: none;
+}
+
+.list-giveaways-container {
+  -ms-overflow-style: none; /* IE y Edge */
+  scrollbar-width: none;    /* Firefox */
 }
 
 .giveaway-card {
@@ -15,12 +25,13 @@
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 20px;
+  margin-left: 100px; /* alinear la card hacia la derecha */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   min-height: 100px;
-  width: 100%;
-  max-width: 100%;
+  width: 70%;
+  max-width: 70%;
   position: relative;
   font-family: 'Poppins', sans-serif;
   box-sizing: border-box;
@@ -98,6 +109,7 @@
 .dropdown-container {
   position: relative;
   margin-bottom: 8px;
+  z-index: 1001;
 }
 
 .menu-button {
@@ -129,62 +141,60 @@
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
-  right: 0;
+  top: 0;
+  left: calc(100% + 8px); /* abrir a la derecha del botón/card */
   background: white;
-  border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 120px;
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
+  transform: translateX(-10px);
   transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column; /* vertical, uno debajo del otro */
+  gap: 0;
+  padding: 3px 0;
+  min-width: 160px;
+  margin-left: 10px;
+  margin-top: 15px;
 }
 
 .dropdown-menu.show {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateX(0);
 }
 
 .dropdown-item {
-  width: 100%;
   background: transparent;
   border: none;
-  padding: 12px 16px;
+  padding: 10px 12px;
   text-align: left;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
   font-family: 'Poppins', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #333;
   transition: background 0.2s;
+  width: 100%;
 }
 
 .dropdown-item:hover {
   background: #f5f5f5;
 }
 
-.dropdown-item:first-child {
-  border-radius: 8px 8px 0 0;
-}
-
-.dropdown-item:last-child {
-  border-radius: 0 0 8px 8px;
-}
-
-.dropdown-item:only-child {
-  border-radius: 8px;
-}
+/* en horizontal no necesitamos bordes especiales por posición */
 
 .config-option {
   color: #6c757d;
   
   mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
     color: #6c757d;
   }
   
@@ -286,6 +296,22 @@
   width: 18px;
   height: 18px;
   color: #d32f2f;
+}
+
+/* Histórico en verde */
+.download-option {
+  color: #2e7d32; /* verde */
+}
+
+.download-option:hover {
+  background: #e8f5e9; /* verde muy claro */
+}
+
+.download-option mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #2e7d32;
 }
 
 .play-button {

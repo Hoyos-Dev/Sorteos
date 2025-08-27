@@ -24,6 +24,10 @@
             <mat-icon>settings</mat-icon>
             <span>Configuración</span>
           </button>
+          <button class="dropdown-item download-option" (click)="onDownloadHistoryClick(sorteo.id)">
+            <mat-icon>download</mat-icon>
+            <span>Histórico</span>
+          </button>
           <button class="dropdown-item delete-option" (click)="onDeleteClick(sorteo.id)">
             <mat-icon>delete</mat-icon>
             <span>Eliminar</span>

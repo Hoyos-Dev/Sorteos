@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ParticipantesService, SorteoListResponse } from '../../services/participantes.service';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-list-giveaways',
@@ -243,6 +244,60 @@ export class ListGiveawaysComponent implements OnInit, OnDestroy {
     
     // Sorteo con ganadores pero no completo (X/N donde X > 0 y X < N) → ACTIVO
     return 'ACTIVO';
+  }
+
+  onDownloadHistoryClick(sorteoId: number): void {
+    // Cerrar el dropdown
+    this.openDropdownId = null;
+    
+    // Obtener información del sorteo
+    const sorteo = this.sorteos.find(s => s.id === sorteoId);
+    if (!sorteo) {
+      console.error('Sorteo no encontrado');
+      return;
+    }
+    
+    // Obtener ganadores del sorteo
+    this.participantesService.obtenerGanadoresPorSorteo(sorteoId).subscribe({
+      next: (ganadores) => {
+        if (ganadores.length === 0) {
+          alert('Este sorteo no tiene ganadores registrados.');
+          return;
+        }
+        
+        // Preparar datos para Excel
+        const datosExcel = ganadores.map(ganador => ({
+          'Nombre': ganador.nombre_participante,
+          'Documento': ganador.documento_participante,
+          'Fecha Ganador': ganador.fecha_ganador ? new Date(ganador.fecha_ganador).toLocaleDateString('es-ES') : 'No registrada'
+        }));
+        
+        // Crear libro de Excel
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(datosExcel);
+        
+        // Ajustar ancho de columnas
+        const columnWidths = [
+          { wch: 30 }, // Nombre
+          { wch: 15 }, // Documento
+          { wch: 15 }  // Fecha
+        ];
+        worksheet['!cols'] = columnWidths;
+        
+        // Agregar hoja al libro
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Ganadores');
+        
+        // Generar nombre del archivo
+        const nombreArchivo = `Historico_Ganadores_${sorteo.nombre.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+        
+        // Descargar archivo
+        XLSX.writeFile(workbook, nombreArchivo);
+      },
+      error: (error) => {
+        console.error('Error al obtener ganadores:', error);
+        alert('Error al obtener el histórico de ganadores.');
+      }
+    });
   }
 
 }
