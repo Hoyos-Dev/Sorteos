@@ -2,7 +2,8 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { ParticipantesService, SorteoListResponse } from '../../services/participantes.service';
+import { ParticipantesService } from '../../../../core/services/participantes.service';
+import { SorteoListResponse } from '../../../../core/models';
 
 interface Participante {
   documento: string;

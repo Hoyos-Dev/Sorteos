@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { ParticipantesService, RegistroParticipantesResponse, RegistroSorteoConParticipantesResponse } from '../../services/participantes.service';
+import { ParticipantesService } from '../../../../core/services/participantes.service';
+import { RegistroParticipantesResponse, RegistroSorteoConParticipantesResponse } from '../../../../core/models';
 
 @Component({
   selector: 'app-register-giveaway',

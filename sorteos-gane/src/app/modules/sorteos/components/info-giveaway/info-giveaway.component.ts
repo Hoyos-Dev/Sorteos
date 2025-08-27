@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
-import { ParticipantesService, Ganador } from '../../services/participantes.service';
+import { ParticipantesService } from '../../../../core/services/participantes.service';
+import { Ganador } from '../../../../core/models';
 import { Subscription } from 'rxjs';
 
 @Component({

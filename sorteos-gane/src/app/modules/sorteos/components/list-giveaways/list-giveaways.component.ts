@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ParticipantesService, SorteoListResponse } from '../../services/participantes.service';
+import { ParticipantesService } from '../../../../core/services/participantes.service';
+import { SorteoListResponse } from '../../../../core/models';
 import * as XLSX from 'xlsx';
 
 @Component({

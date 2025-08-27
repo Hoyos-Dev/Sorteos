@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnChanges, ViewEncapsulation } from '@angular/core';
-import { SorteosService } from '../../services/sorteos.service';
+import { SorteosService } from '../../../../core/services/sorteos.service';
 
 @Component({
   selector: 'app-settings-giveaway',
