@@ -1,0 +1,17 @@
+<div class="modal-backdrop" *ngIf="visible" (click)="onBackdropClick($event)">
+  <div class="custom-modal" [ngClass]="'type-' + type">
+    <button class="close-modal" type="button" (click)="onClose()" aria-label="Cerrar">&times;</button>
+    <div class="modal-icon-wrapper">
+      <div class="modal-icon-bg">
+        <mat-icon class="modal-icon">{{ icon }}</mat-icon>
+      </div>
+    </div>
+    <h2 class="modal-title">{{ title }}</h2>
+    <p class="modal-message">{{ message }}</p>
+    <div class="modal-actions">
+      <button class="btn-check" (click)="onConfirm()">{{ confirmText }}</button>
+    </div>
+  </div>
+</div>
+
+

@@ -50,6 +50,18 @@
   (closeModal)="onCloseModal()">
 </app-info-giveaway>
 
+<!-- Modal compartido para alertas/confirmaciones -->
+<app-shared-modal
+  [visible]="modal.visible"
+  [type]="modal.type"
+  [title]="modal.title"
+  [message]="modal.message"
+  [showCancel]="modal.showCancel"
+  (confirm)="onModalConfirm()"
+  (cancel)="onModalCancel()"
+  (closed)="onModalClosed()">
+</app-shared-modal>
+
 <!-- Modal de configuraciones del sorteo -->
 <app-settings-giveaway 
   [mostrar]="isConfigModalVisible" 

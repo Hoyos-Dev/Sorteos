@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { SharedModule } from '../../shared/shared.module';
 
 import { SorteosRoutingModule } from './sorteos-routing.module';
 import { OrchestratorComponent } from './pages/orchestrator/orchestrator.component';
@@ -27,7 +28,8 @@ import { SettingsGiveawayComponent } from './components/settings-giveaway/settin
     CommonModule,
     FormsModule,
     SorteosRoutingModule,
-    MatIconModule
+    MatIconModule,
+    SharedModule
   ]
 })
 export class SorteosModule { }

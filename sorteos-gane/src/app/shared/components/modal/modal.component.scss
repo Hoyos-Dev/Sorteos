@@ -1,0 +1,144 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.custom-modal {
+  position: relative;
+  width: 70%;
+  max-width: 450px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 30px 26px 26px 26px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
+  text-align: center;
+  margin: 0 auto;
+  font-family: 'Poppins', sans-serif;
+}
+
+.close-modal {
+  position: absolute;
+  top: 22px;
+  right: 28px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #7f7f7f;
+  cursor: pointer;
+  z-index: 2;
+  line-height: 1;
+  padding: 0;
+}
+
+.close-modal:hover {
+  transition: color 0.5s;
+  color: #414142;
+}
+
+.modal-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.modal-icon-bg {
+  background: #effce0;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-icon {
+  color: #0ed422;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.modal-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #181f2c;
+  margin: 12px 0 6px 0; /* más cerca del mensaje */
+  font-family: 'Poppins', sans-serif;
+}
+
+.modal-message {
+  font-size: 1.15rem;
+  color: #6b7280;
+  margin-bottom: 28px;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.4;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: 500;
+}
+
+.btn-secondary:hover { background: #e6e6e6; }
+
+.btn-check {
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 190px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: 500;
+}
+
+.btn-check:disabled { background-color: #cccccc; cursor: not-allowed; }
+
+/* Variantes por tipo: colores del círculo/icono */
+.type-success .modal-icon-bg { background: #e8f5e9; }
+.type-success .modal-icon { color: #2e7d32; }
+.type-success .btn-check { background-color: #2e7d32; }
+.type-success .btn-check:hover { background-color: #1b5e20; }
+
+.type-error .modal-icon-bg { background: #ffebee; }
+.type-error .modal-icon { color: #d32f2f; }
+.type-error .btn-check { background-color: #d32f2f; }
+.type-error .btn-check:hover { background-color: #b71c1c; }
+
+.type-warning .modal-icon-bg { background: #fff3e0; }
+.type-warning .modal-icon { color: #ed6c02; }
+.type-warning .btn-check { background-color: #ed6c02; }
+.type-warning .btn-check:hover { background-color: #c75802; }
+
+.type-info .modal-icon-bg { background: #e3f2fd; }
+.type-info .modal-icon { color: #1976d2; }
+.type-info .btn-check { background-color: #003594; }
+.type-info .btn-check:hover { background-color: #0047B3; }
+
+.type-confirm .modal-icon-bg { background: #eceff1; }
+.type-confirm .modal-icon { color: #6c757d; }
+.type-confirm .btn-check { background-color: #6c757d; }
+.type-confirm .btn-check:hover { background-color: #545b62; }
+
+
