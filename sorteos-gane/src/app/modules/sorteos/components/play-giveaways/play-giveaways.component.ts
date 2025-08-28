@@ -101,19 +101,27 @@ export class PlayGiveawaysComponent implements OnInit {
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-    if (event.key === 'a' || event.key === 'A') {
+    // Retroceder con A o Esc
+    if (event.key === 'a' || event.key === 'A' || event.key === 'Escape') {
       this.location.back();
-    } else if (event.key === 'j' || event.key === 'J') {
+    } 
+    // Iniciar juego con J, Enter, Espacio o Flecha derecha
+    else if (
+      event.key === 'j' || event.key === 'J' || 
+      event.key === 'Enter' || 
+      event.key === ' ' ||          // barra espaciadora
+      event.key === 'ArrowRight'    // flecha derecha
+    ) {
       // Verificar si el sorteo está finalizado antes de permitir iniciar el juego
       if (this.sorteoInfo && this.sorteoInfo.estado === 'finalizado') {
         console.log('El sorteo está finalizado, no se puede iniciar el juego');
         return;
       }
-      
+  
       this.iniciarJuego();
     }
   }
-
+  
   iniciarJuego() {
     console.log('Tecla J presionada - Iniciando juego');
     console.log('Estado actual - Ganadores:', this.ganadoresActuales, 'Cantidad premio:', this.sorteoInfo?.cantidad_premio);

@@ -12,13 +12,20 @@
   height: 100vh;
   padding: 20px;
   box-sizing: border-box;
-  background-image: url('../../../../../assets/image/fondo-portal.jpg');
+  
+  background: 
+    linear-gradient(rgba(250, 250, 250, 0.726)), /* claridad media */
+    url('../../../../../assets/image/fondo-portal2.png');
+  
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   gap: 0;
 }
+
+
+
 
 .left-panel {
   flex: 1;
