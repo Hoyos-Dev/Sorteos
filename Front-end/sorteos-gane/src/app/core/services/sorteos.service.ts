@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environment';
 import { UpdateSorteoRequest, SorteoResponse } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class SorteosService {
-  private apiUrl = 'http://localhost:8001';
+  private apiUrl = environment.apiUrl;
   constructor(private http: HttpClient) {}
 
   updateSorteo(sorteoId: number, data: UpdateSorteoRequest): Observable<SorteoResponse> {

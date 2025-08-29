@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
+import { environment } from '../../environment';
 import {
   Participante,
   RegistroParticipantesRequest,
@@ -15,7 +16,7 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class ParticipantesService {
-  private apiUrl = 'http://localhost:8001';
+  private apiUrl = environment.apiUrl;
   private sorteoCreado = new Subject<void>();
   private ganadorMarcado = new Subject<void>();
 
