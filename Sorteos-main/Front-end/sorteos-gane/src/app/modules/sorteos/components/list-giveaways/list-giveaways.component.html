@@ -1,0 +1,71 @@
+<div class="list-giveaways-container">
+  <div class="giveaway-card" *ngFor="let sorteo of sorteos" [style.border-left-color]="getStatusBorderColor(sorteo)">
+    <div class="card-content" (click)="onCardClick(sorteo)">
+      <!-- Status card -->
+      <div class="status-card">
+        <div class="status-indicator" [ngClass]="getStatusClass(sorteo)">
+          <div class="status-dot" [ngClass]="getStatusClass(sorteo)"></div>
+          <span class="status-text">{{ getStatusText(sorteo) }}</span>
+        </div>
+      </div>
+      <h3 class="card-title">{{ sorteo.nombre }}</h3>
+      <p class="card-description">{{ sorteo.descripcion }}</p>
+      <div class="card-stats">
+        <span class="participants">Participantes: {{ sorteo.cantidad_participantes }}</span>
+      </div>
+    </div>
+    <div class="card-actions">
+      <div class="dropdown-container">
+        <button class="menu-button" (click)="toggleDropdown(sorteo.id)" title="Opciones">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <div class="dropdown-menu" [class.show]="isDropdownOpen(sorteo.id)">
+          <button class="dropdown-item config-option" (click)="onConfigClick(sorteo.id)">
+            <mat-icon>settings</mat-icon>
+            <span>Configuración</span>
+          </button>
+          <button class="dropdown-item download-option" (click)="onDownloadHistoryClick(sorteo.id)">
+            <mat-icon>download</mat-icon>
+            <span>Histórico</span>
+          </button>
+          <button class="dropdown-item delete-option" (click)="onDeleteClick(sorteo.id)">
+            <mat-icon>delete</mat-icon>
+            <span>Eliminar</span>
+          </button>
+        </div>
+      </div>
+      <button class="play-button" (click)="onPlayClick(sorteo.id)">JUGAR</button>
+    </div>
+  </div>
+  
+  <div class="no-giveaways" *ngIf="sorteos.length === 0">
+    <p></p>
+  </div>
+</div>
+
+<!-- Modal de información del sorteo -->
+<app-info-giveaway 
+  [mostrar]="isModalVisible" 
+  [sorteo]="selectedSorteo" 
+  (closeModal)="onCloseModal()">
+</app-info-giveaway>
+
+<!-- Modal compartido para alertas/confirmaciones -->
+<app-shared-modal
+  [visible]="modal.visible"
+  [type]="modal.type"
+  [title]="modal.title"
+  [message]="modal.message"
+  [showCancel]="modal.showCancel"
+  (confirm)="onModalConfirm()"
+  (cancel)="onModalCancel()"
+  (closed)="onModalClosed()">
+</app-shared-modal>
+
+<!-- Modal de configuraciones del sorteo -->
+<app-settings-giveaway 
+  [mostrar]="isConfigModalVisible" 
+  [sorteo]="selectedSorteoForConfig" 
+  (closeModal)="onCloseConfigModal()"
+  (sorteoUpdated)="onSorteoUpdated($event)">
+</app-settings-giveaway>

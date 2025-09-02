@@ -1,0 +1,72 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.orchestrator-layout {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  
+  background: 
+    linear-gradient(rgba(250, 250, 250, 0.726)), /* claridad media */
+    url('../../../../../assets/image/fondo-portal2.png');
+  
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  gap: 0;
+}
+
+
+
+
+.left-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.divider {
+  width: 1.5px;
+  background: #4755693d;
+  flex-shrink: 0;
+  height: 630px;
+  align-self: center;
+}
+
+.right-panel {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .orchestrator-layout {
+    flex-direction: column;
+    padding: 10px;
+  }
+  
+  .left-panel {
+    padding: 15px;
+  }
+  
+  .divider {
+    width: 90%;
+    height: 2px;
+    background: #4755693d;
+    margin: 10px 0;
+  }
+  
+  .right-panel {
+    padding: 15px;
+  }
+}

@@ -1,0 +1,308 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.modal-container *:not(mat-icon):not(.material-icons) {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+mat-icon, .material-icons {
+  font-family: 'Material Icons' !important;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #003594 0%, #0056d3 100%);
+  color: white;
+  padding: 24px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.modal-icon {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.header-text {
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  
+  .subtitle {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+    font-weight: 400;
+  }
+}
+
+.modal-content {
+  padding: 32px;
+}
+
+.config-form {
+  .form-group {
+    margin-bottom: 24px;
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      
+      .input-icon {
+        position: absolute;
+        left: 12px;
+        color: #666;
+        font-size: 20px;
+        z-index: 1;
+        padding-top: 2.5px;
+      }
+      
+      .form-input {
+        width: 100%;
+        padding: 12px 12px 12px 44px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: 'Poppins', sans-serif;
+        transition: border-color 0.3s ease;
+        
+        &:focus {
+          outline: none;
+          border-color: #003594;
+        }
+        
+        &::placeholder {
+          color: #999;
+        }
+      }
+    }
+    
+    .help-text {
+      margin: 6px 0 0 0;
+      color: #666;
+      font-size: 12px;
+      font-style: italic;
+    }
+  }
+  
+  .image-upload-container {
+    .upload-area {
+      border: 2px dashed #e0e0e0;
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      
+      &:hover {
+        border-color: #003594;
+        background-color: #f8f9ff;
+      }
+      
+      .upload-placeholder {
+        .upload-icon {
+          font-size: 40px;
+          width: 40px;
+          height: 40px;
+          color: #ccc;
+          margin: 0 auto 12px auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        p {
+          margin: 0 0 8px 0;
+          color: #666;
+          font-size: 14px;
+          font-weight: 500;
+        }
+        
+        .upload-hint {
+          color: #999;
+          font-size: 12px;
+        }
+      }
+      
+      .image-preview {
+        position: relative;
+        
+        .preview-image {
+          max-width: 100%;
+          max-height: 200px;
+          border-radius: 6px;
+          object-fit: cover;
+        }
+        
+        .image-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.7);
+          color: white;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          border-radius: 6px;
+          
+          mat-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+          }
+          
+          span {
+            font-size: 12px;
+          }
+        }
+        
+        &:hover .image-overlay {
+          opacity: 1;
+        }
+      }
+    }
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 32px;
+    
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+      
+      &.btn-secondary {
+        background-color: #f5f5f5;
+        color: #666;
+        
+        &:hover:not(:disabled) {
+          background-color: #e0e0e0;
+        }
+      }
+      
+      &.btn-primary {
+        background: linear-gradient(135deg, #003594 0%, #0056d3 100%);
+        color: white;
+        
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 53, 148, 0.3);
+        }
+        
+        .loading-icon {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

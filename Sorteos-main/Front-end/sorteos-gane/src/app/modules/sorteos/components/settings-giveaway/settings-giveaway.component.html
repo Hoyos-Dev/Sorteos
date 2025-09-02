@@ -1,0 +1,113 @@
+<div class="modal-overlay" *ngIf="mostrar" (click)="onBackdropClick($event)">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <div class="modal-icon">
+          <mat-icon>settings</mat-icon>
+        </div>
+        <div class="header-text">
+          <h2>{{ sorteo?.nombre || 'Sorteo' }}</h2>
+          <p class="subtitle">Configuración del sorteo</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+      <div class="config-form">
+        <!-- Configuración de cantidad de premios -->
+        <div class="form-group">
+          <label for="cantidadPremio">Cantidad de ganadores</label>
+          <div class="input-container">
+            <mat-icon class="input-icon">emoji_events</mat-icon>
+            <input 
+              type="number" 
+              id="cantidadPremio" 
+              [(ngModel)]="cantidadPremio" 
+              min="1" 
+              max="100"
+              class="form-input"
+              placeholder="Número de ganadores">
+          </div>
+          <p class="help-text">Define cuántas personas pueden ganar en este sorteo</p>
+        </div>
+
+        <!-- Configuración de ganadores simultáneos -->
+        <div class="form-group">
+          <label for="ganadoresSimultaneos">Ganadores simultáneos</label>
+          <div class="input-container">
+            <mat-icon class="input-icon">groups</mat-icon>
+            <input 
+              type="number" 
+              id="ganadoresSimultaneos" 
+              [(ngModel)]="ganadoresSimultaneos" 
+              min="1" 
+              max="5"
+              class="form-input"
+              placeholder="Cuadros blancos a mostrar">
+          </div>
+          <p class="help-text">Cuántos cuadros blancos aparecerán al presionar J (máximo 5)</p>
+        </div>
+
+        <!-- Subida de imagen -->
+        <div class="form-group">
+          <label for="imageUpload">Imagen del sorteo</label>
+          <div class="image-upload-container">
+            <div class="upload-area" (click)="fileInput.click()">
+              <div *ngIf="!imagePreview" class="upload-placeholder">
+                <mat-icon class="upload-icon">cloud_upload</mat-icon>
+                <p>Haz clic para subir una imagen</p>
+                <span class="upload-hint">PNG, JPG hasta 5MB</span>
+              </div>
+              <div *ngIf="imagePreview" class="image-preview">
+                <img [src]="imagePreview" alt="Preview" class="preview-image">
+                <div class="image-overlay">
+                  <mat-icon>edit</mat-icon>
+                  <span>Cambiar imagen</span>
+                </div>
+              </div>
+            </div>
+            <input 
+              #fileInput
+              type="file" 
+              id="imageUpload" 
+              (change)="onImageSelected($event)"
+              accept="image/*"
+              style="display: none;">
+          </div>
+          <p class="help-text">Esta imagen se mostrará durante el sorteo</p>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="onClose()"
+            [disabled]="isLoading">
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="onSaveSettings()"
+            [disabled]="isLoading">
+            <mat-icon *ngIf="isLoading" class="loading-icon">hourglass_empty</mat-icon>
+            <mat-icon *ngIf="!isLoading">save</mat-icon>
+            {{ isLoading ? 'Guardando...' : 'Guardar configuración' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal para mensajes de validación -->
+  <app-shared-modal 
+    #winnersModal
+    [visible]="false"
+    (confirm)="onModalConfirm()"
+    (cancel)="onModalCancel()"
+    (closed)="onModalClose()">
+  </app-shared-modal>
+</div>

@@ -1,0 +1,87 @@
+<div class="modal-overlay" *ngIf="mostrar" (click)="onBackdropClick($event)"> 
+   <div class="modal-container" (click)="$event.stopPropagation()"> 
+     <!-- Header --> 
+     <div class="modal-header"> 
+       <div class="header-content"> 
+         <div class="modal-icon"> 
+           <mat-icon>analytics</mat-icon> 
+         </div> 
+         <div class="header-text"> 
+           <h2>{{ sorteoDetalle?.nombre || sorteo?.nombre || 'Sorteo' }}</h2> 
+           <p class="subtitle">Información detallada del sorteo</p> 
+         </div> 
+       </div> 
+     </div> 
+ 
+     <!-- Content --> 
+     <div class="modal-content"> 
+       <!-- Two columns section --> 
+       <div class="info-grid"> 
+         <div class="info-column"> 
+           <div class="column-header"> 
+             <mat-icon>info_outline</mat-icon> 
+             <h3>Detalles Generales</h3> 
+           </div> 
+           <div class="info-items"> 
+             <div class="info-item"> 
+               <span class="label">Participantes</span> 
+               <span class="value">{{ sorteoDetalle?.participantes?.length || sorteo?.cantidad_participantes || 0 }}</span> 
+             </div> 
+             <div class="info-item"> 
+               <span class="label">Fecha de creación</span> 
+               <span class="value">{{ formatearFecha(sorteoDetalle?.fechaCreacion || sorteo?.fecha_creacion) }}</span> 
+             </div> 
+           </div> 
+         </div> 
+ 
+         <div class="divider"></div> 
+ 
+         <div class="info-column"> 
+           <div class="column-header"> 
+             <mat-icon>settings</mat-icon> 
+             <h3>Configuración</h3> 
+           </div> 
+           <div class="info-items"> 
+             <div class="info-item"> 
+               <span class="label">Premios configurados</span> 
+               <span class="value">{{ sorteoDetalle?.cantidad_premio || sorteo?.cantidad_premio || sorteoDetalle?.cantidadPremio || sorteo?.cantidadPremio || 1 }}</span> 
+             </div> 
+             <div class="info-item"> 
+               <span class="label">Progreso de ganadores</span> 
+               <span class="value">{{ (sorteoDetalle?.ganadores?.length || ganadores.length || 0) }}/{{ (sorteoDetalle?.cantidad_premio || sorteo?.cantidad_premio || sorteoDetalle?.cantidadPremio || sorteo?.cantidadPremio || 1) }}</span> 
+             </div> 
+           </div> 
+         </div> 
+       </div> 
+ 
+       <!-- Winners section --> 
+       <div class="winners-section"> 
+         <div class="section-header"> 
+           <h3>Historial de Ganadores</h3> 
+         </div> 
+         
+         <div class="winners-content" *ngIf="(sorteoDetalle?.ganadores && sorteoDetalle.ganadores.length > 0) || (ganadores && ganadores.length > 0)">
+          <div class="ganadores-lista">
+            <div class="ganador-item" *ngFor="let ganador of (sorteoDetalle?.ganadores || ganadores); let i = index"> 
+               <div class="ganador-badge"> 
+                 <span>{{ i + 1 }}</span> 
+               </div> 
+               <div class="ganador-info"> 
+                 <div class="ganador-nombre-container"> 
+                   <span class="ganador-nombre">{{ ganador.nombre_participante }}</span> 
+                   <span class="ganador-documento">{{ ganador.documento_participante }}</span> 
+                 </div> 
+                 <span class="ganador-fecha">{{ formatearFecha(ganador.fecha_ganador) }}</span> 
+               </div> 
+             </div> 
+           </div> 
+         </div> 
+         
+         <div class="no-winners" *ngIf="(!sorteoDetalle?.ganadores || sorteoDetalle.ganadores.length === 0) && (!ganadores || ganadores.length === 0)"> 
+           <mat-icon>sentiment_neutral</mat-icon> 
+           <p>Aún no hay ganadores en este sorteo</p> 
+         </div> 
+       </div> 
+     </div> 
+   </div> 
+ </div>

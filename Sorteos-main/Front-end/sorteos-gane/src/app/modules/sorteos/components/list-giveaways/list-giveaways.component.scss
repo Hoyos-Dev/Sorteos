@@ -1,0 +1,334 @@
+.list-giveaways-container {
+  padding: 20px 20px 20px 20px;
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto; /* mantiene el scroll pero lo ocultamos visualmente */
+  position: relative;
+  scroll-behavior: smooth;
+}
+
+/* Ocultar visualmente la barra de scroll (manteniendo el desplazamiento) */
+.list-giveaways-container::-webkit-scrollbar {
+  display: none;
+}
+
+.list-giveaways-container {
+  -ms-overflow-style: none; /* IE y Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+
+.giveaway-card {
+  background: rgb(255, 255, 255);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  margin-left: 100px; /* alinear la card hacia la derecha */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  min-height: 100px;
+  width: 70%;
+  max-width: 70%;
+  position: relative;
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  border-left: 9px solid #003594; /* Color por defecto, será sobrescrito dinámicamente */
+}
+
+.giveaway-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding-right: 16px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.card-content:hover {
+  opacity: 0.8;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #003594;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.card-description {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.winners, .participants {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.winners {
+  color: #003594;
+}
+
+.card-actions {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.dropdown-container {
+  position: relative;
+  margin-bottom: 8px;
+  z-index: 1001;
+}
+
+.menu-button {
+  background: transparent;
+  color: #003594;
+  border: none;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 30px;
+}
+
+.menu-button:hover {
+  background: rgba(0, 53, 148, 0.1);
+}
+
+.menu-button mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  color: #003594;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 8px); /* abrir a la derecha del botón/card */
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-10px);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column; /* vertical, uno debajo del otro */
+  gap: 0;
+  padding: 3px 0;
+  min-width: 160px;
+  margin-left: 10px;
+  margin-top: 15px;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.dropdown-item {
+  background: transparent;
+  border: none;
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  color: #333;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.dropdown-item:hover {
+  background: #f5f5f5;
+}
+
+/* en horizontal no necesitamos bordes especiales por posición */
+
+.config-option {
+  color: #6c757d;
+  
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #6c757d;
+  }
+  
+  &:hover {
+    background: #f8f9fa;
+    color: #495057;
+  }
+}
+
+// Status card styles
+.status-card {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 4px 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-text {
+  font-size: 10px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.3px;
+}
+
+// Estado Activo (Verde)
+.status-activo .status-dot {
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+}
+
+.status-activo .status-indicator {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+// Estado Sin Configurar/Pendiente (Azul)
+.status-sin-configurar .status-dot {
+  background-color: #003594;
+  box-shadow: 0 0 0 0 rgba(0, 53, 148, 0.7);
+}
+
+.status-sin-configurar .status-indicator {
+  border-color: rgba(0, 53, 148, 0.3);
+}
+
+// Estado Finalizado (Rojo)
+.status-finalizado .status-dot {
+  background-color: #d32f2f;
+  box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7);
+}
+
+.status-finalizado .status-indicator {
+  border-color: rgba(211, 47, 47, 0.3);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 3px transparent;
+  }
+  
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 currentColor;
+  }
+}
+
+.delete-option {
+  color: #d32f2f;
+}
+
+.delete-option:hover {
+  background: #ffebee;
+}
+
+.delete-option mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #d32f2f;
+}
+
+/* Histórico en verde */
+.download-option {
+  color: #2e7d32; /* verde */
+}
+
+.download-option:hover {
+  background: #e8f5e9; /* verde muy claro */
+}
+
+.download-option mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #2e7d32;
+}
+
+.play-button {
+  width: auto;
+  background: #003594;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.5rem;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'Poppins', sans-serif;
+}
+
+.play-button:hover {
+  background: #0047B3;
+}

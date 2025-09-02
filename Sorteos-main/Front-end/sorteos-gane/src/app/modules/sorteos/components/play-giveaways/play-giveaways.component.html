@@ -1,0 +1,17 @@
+<div class="jugar-bg" [ngStyle]="sorteoImagen ? {'background-image': 'url(' + sorteoImagen + ')'} : {}">
+  <!-- Mostrar cuadro único para compatibilidad con sorteos de 1 ganador -->
+  <div *ngIf="cuadrosGanadores === 1" class="cuadro-blanco">
+    <div class="participante-info">
+      <h2 class="participante-nombre" [innerHTML]="nombreAnimadoHTML"></h2>
+    </div>
+  </div>
+  
+  <!-- Mostrar múltiples cuadros para sorteos de múltiples ganadores -->
+  <div *ngIf="cuadrosGanadores > 1" class="contenedor-multiples-cuadros">
+    <div *ngFor="let ganador of ganadoresSimultaneos; let i = index" class="cuadro-blanco-multiple">
+      <div class="participante-info">
+        <h2 class="participante-nombre" [innerHTML]="nombresAnimadosHTML[i]"></h2>
+      </div>
+    </div>
+  </div>
+</div>

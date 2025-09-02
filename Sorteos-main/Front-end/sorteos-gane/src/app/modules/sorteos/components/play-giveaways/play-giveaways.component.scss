@@ -1,0 +1,175 @@
+.jugar-bg {
+  min-height: 100vh;
+  min-width: 100vw;
+  width: 100vw;
+  height: 100vh;
+  background: url('/assets/image/bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+// Estilos removidos - la imagen ahora se usa como fondo
+
+// Contenedor para múltiples cuadros
+.contenedor-multiples-cuadros {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+// Estilos para cuadros múltiples
+.cuadro-blanco-multiple {
+  background-color: white;
+  width: 1850px;
+  height: 120px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.cuadro-blanco {
+  background-color: white;
+  width: 1800px;
+  height: 150px;
+  border-radius: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.participante-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 200px;
+  z-index: 1001;
+  position: relative;
+}
+
+.participante-nombre {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  text-transform: uppercase;
+  font-family: 'Poppins', sans-serif;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  text-align: center;
+  min-width: 600px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 3rem;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: visible;
+  z-index: 1002;
+  position: relative;
+}
+
+.participante-nombre .letra {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.participante-nombre .letra {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 0.5rem;
+  height: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+@media screen and (width: 1366px) and (height: 768px) {
+  .cuadro-blanco {
+    background-color: white;
+    width: 1300px;
+    height: 100px;
+    border-radius: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .participante-nombre {
+    font-size: 2rem; /* 40% menos que 3rem */
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    text-transform: uppercase;
+    font-family: 'Poppins', sans-serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    text-align: center;
+    min-width: 600px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1.8rem; /* Ajustado proporcionalmente */
+    justify-content: center;
+    align-items: center;
+    gap: 0.3rem; /* Reducido proporcionalmente */
+    overflow: visible;
+    z-index: 1002;
+    position: relative;
+  }
+
+  .participante-nombre .letra {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 0.3rem;
+    height: 0.3rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.6rem; /* Reducido proporcionalmente */
+    font-weight: bold;
+    text-align: center;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  
+  // Estilos responsivos para cuadros múltiples
+  .contenedor-multiples-cuadros {
+    gap: 20px;
+  }
+  
+  .cuadro-blanco-multiple {
+    width: 1000px;
+    height: 80px;
+    border-radius: 15px;
+  }
+}
