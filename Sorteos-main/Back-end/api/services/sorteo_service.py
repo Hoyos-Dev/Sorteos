@@ -617,24 +617,125 @@ class SorteoService:
                 print(f"Límite de ganadores alcanzado: {ganadores_actuales}/{cantidad_premio}")
                 return None
             
-            # Obtener un participante aleatorio que no sea ganador
-            query = """
-                SELECT ds.documento_participante as documento, p.nombre
+            # Obtener múltiples participantes aleatorios que no sean ganadores
+            # Primero, ver cuántos participantes disponibles hay
+            count_query = """
+                SELECT COUNT(*) as total
                 FROM detalle_sorteo ds
+                WHERE ds.id_sorteo = %s 
+                AND ds.estado != 'ganador'
+                AND ds.estado != 'eliminado'
+                AND ds.estado != 'descalificado'
+            """
+            cursor.execute(count_query, (sorteo_id,))
+            total_participantes = cursor.fetchone()['total']
+            
+            if total_participantes == 0:
+                print("No hay participantes disponibles para el sorteo")
+                return None
+                
+            # Asegurarse de no pedir más participantes de los disponibles
+            limite = min(cantidad_premio - ganadores_actuales, total_participantes)
+            
+            # Obtener múltiples ganadores a la vez
+            query = """
+                SELECT ds.id as detalle_id, 
+                       ds.documento_participante as documento, 
+                       p.nombre,
+                       @rownum := @rownum + 1 as row_num
+                FROM (SELECT @rownum := 0) r,
+                     detalle_sorteo ds
                 JOIN participantes p ON ds.documento_participante = p.documento
-                WHERE ds.id_sorteo = %s AND ds.estado != 'ganador'
+                WHERE ds.id_sorteo = %s 
+                AND ds.estado NOT IN ('ganador', 'eliminado', 'descalificado')
                 ORDER BY RAND()
-                LIMIT 1
+                LIMIT %s
             """
             
-            cursor.execute(query, (sorteo_id,))
-            result = cursor.fetchone()
+            cursor.execute(query, (sorteo_id, limite))
+            results = cursor.fetchall()
             
-            return result
+            # Si solo necesitamos un ganador, devolver el primero
+            if len(results) == 1:
+                return results[0]
+            # Si necesitamos múltiples ganadores, devolver la lista
+            elif len(results) > 1:
+                return results
+            
+            return None
             
         except mysql.connector.Error as e:
             print(f"Error obteniendo participante aleatorio: {e}")
             return None
+        finally:
+            if connection.is_connected():
+                cursor.close()
+                connection.close()
+    
+    @staticmethod
+    def obtener_multiples_participantes_aleatorios(sorteo_id: int, cantidad: int) -> List[dict]:
+        """Obtiene múltiples participantes aleatorios únicos de un sorteo que no hayan ganado"""
+        try:
+            connection = mysql.connector.connect(**DB_CONFIG)
+            cursor = connection.cursor(dictionary=True)
+            
+            # Verificar límite de ganadores
+            cursor.execute("""
+                SELECT s.cantidad_premio, COUNT(ds.id) as ganadores_actuales
+                FROM sorteo s
+                LEFT JOIN detalle_sorteo ds ON s.id = ds.id_sorteo AND ds.estado = 'ganador'
+                WHERE s.id = %s
+                GROUP BY s.id, s.cantidad_premio
+            """, (sorteo_id,))
+            
+            limite_result = cursor.fetchone()
+            if not limite_result:
+                return []
+                
+            cantidad_premio = limite_result['cantidad_premio'] or 1
+            ganadores_actuales = limite_result['ganadores_actuales'] or 0
+            
+            # Calcular cuántos ganadores más se pueden seleccionar
+            disponibles = cantidad_premio - ganadores_actuales
+            if disponibles <= 0:
+                print(f"Límite de ganadores alcanzado: {ganadores_actuales}/{cantidad_premio}")
+                return []
+                
+            # No pedir más de los disponibles
+            cantidad = min(cantidad, disponibles)
+            
+            # Obtener participantes aleatorios que no sean ganadores, eliminados o descalificados
+            query = """
+                SELECT ds.id as detalle_id, 
+                       ds.documento_participante as documento, 
+                       p.nombre,
+                       @rownum := @rownum + 1 as row_num
+                FROM (SELECT @rownum := 0) r,
+                     detalle_sorteo ds
+                JOIN participantes p ON ds.documento_participante = p.documento
+                WHERE ds.id_sorteo = %s 
+                AND ds.estado NOT IN ('ganador', 'eliminado', 'descalificado')
+                ORDER BY RAND()
+                LIMIT %s
+            """
+            
+            cursor.execute(query, (sorteo_id, cantidad))
+            resultados = cursor.fetchall()
+            
+            # Formatear resultados para mantener consistencia con el método existente
+            participantes = []
+            for res in resultados:
+                participantes.append({
+                    'detalle_id': res['detalle_id'],
+                    'documento': res['documento'],
+                    'nombre': res['nombre']
+                })
+            
+            return participantes
+            
+        except mysql.connector.Error as e:
+            print(f"Error obteniendo múltiples participantes aleatorios: {e}")
+            return []
         finally:
             if connection.is_connected():
                 cursor.close()

@@ -317,6 +317,11 @@ class ParticipanteAleatorioResponse(BaseModel):
     participante: Optional[dict]
     mensaje: str
 
+class MultiplesParticipantesResponse(BaseModel):
+    ok: bool
+    participantes: List[dict]
+    mensaje: str
+
 @router.get("/obtener-participante-aleatorio/{sorteo_id}", response_model=ParticipanteAleatorioResponse)
 def obtener_participante_aleatorio(sorteo_id: int):
     """Obtiene un participante aleatorio de un sorteo que no haya ganado"""
@@ -339,6 +344,39 @@ def obtener_participante_aleatorio(sorteo_id: int):
                 ok=False,
                 participante=None,
                 mensaje="No hay participantes disponibles para el sorteo"
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+@router.get("/obtener-participantes-aleatorios/{sorteo_id}/{cantidad}", response_model=MultiplesParticipantesResponse)
+def obtener_multiples_participantes_aleatorios(sorteo_id: int, cantidad: int):
+    """Obtiene múltiples participantes aleatorios únicos de un sorteo que no hayan ganado"""
+    try:
+        # Verificar que el sorteo existe
+        sorteo = SorteoService.obtener_sorteo(sorteo_id)
+        if not sorteo:
+            raise HTTPException(status_code=404, detail="Sorteo no encontrado")
+        
+        # Validar que la cantidad sea válida
+        if cantidad < 1 or cantidad > 10:  # Límite de 10 participantes por solicitud
+            raise HTTPException(status_code=400, detail="La cantidad de participantes debe estar entre 1 y 10")
+        
+        # Obtener múltiples participantes únicos
+        participantes = SorteoService.obtener_multiples_participantes_aleatorios(sorteo_id, cantidad)
+        
+        if participantes:
+            return MultiplesParticipantesResponse(
+                ok=True,
+                participantes=participantes,
+                mensaje=f"Se obtuvieron {len(participantes)} participantes aleatorios"
+            )
+        else:
+            return MultiplesParticipantesResponse(
+                ok=False,
+                participantes=[],
+                mensaje="No hay suficientes participantes disponibles para el sorteo"
             )
     except HTTPException:
         raise

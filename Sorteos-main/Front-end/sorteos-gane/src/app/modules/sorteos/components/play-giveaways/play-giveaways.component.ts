@@ -187,41 +187,24 @@ export class PlayGiveawaysComponent implements OnInit {
   }
 
   private obtenerMultiplesParticipantes(): void {
-    const participantesObtenidos: Participante[] = [];
-    let participantesRestantes = this.cuadrosGanadores;
-    
-    const obtenerSiguienteParticipante = () => {
-      if (participantesRestantes <= 0) {
-        // Todos los participantes obtenidos, iniciar animaciones
-        this.procesarGanadoresSimultaneos(participantesObtenidos);
-        return;
-      }
-      
-      this.http.get<any>(`http://localhost:8001/obtener-participante-aleatorio/${this.sorteoId}`).subscribe({
-        next: (response) => {
-          console.log('Respuesta del servidor:', response);
-          if (response.ok && response.participante) {
-            console.log('Participante obtenido:', response.participante);
-            participantesObtenidos.push(response.participante);
-            participantesRestantes--;
-            // Obtener siguiente participante
-            setTimeout(() => obtenerSiguienteParticipante(), 100);
-          } else {
-            // No hay más participantes disponibles
-            console.log('No hay más participantes disponibles para el sorteo');
-            this.procesarGanadoresSimultaneos(participantesObtenidos);
-          }
-        },
-        error: (error) => {
-          console.error('Error al obtener participante:', error);
-          participantesRestantes--;
-          // Continuar con el siguiente aunque haya error
-          setTimeout(() => obtenerSiguienteParticipante(), 100);
+    // Usar el nuevo endpoint para obtener múltiples participantes a la vez
+    this.http.get<any>(`http://localhost:8001/obtener-participantes-aleatorios/${this.sorteoId}/${this.cuadrosGanadores}`).subscribe({
+      next: (response) => {
+        console.log('Respuesta del servidor (múltiples participantes):', response);
+        
+        if (response.ok && response.participantes && response.participantes.length > 0) {
+          console.log('Participantes obtenidos:', response.participantes);
+          this.procesarGanadoresSimultaneos(response.participantes);
+        } else {
+          console.log('No hay suficientes participantes disponibles para el sorteo');
+          this.procesarGanadoresSimultaneos([]);
         }
-      });
-    };
-    
-    obtenerSiguienteParticipante();
+      },
+      error: (error) => {
+        console.error('Error al obtener participantes:', error);
+        this.procesarGanadoresSimultaneos([]);
+      }
+    });
   }
 
   private procesarGanadoresSimultaneos(participantes: Participante[]): void {
